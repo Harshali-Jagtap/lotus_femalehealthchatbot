@@ -1,0 +1,2 @@
+def dashboard():
+    return None

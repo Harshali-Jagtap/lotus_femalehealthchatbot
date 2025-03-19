@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Female Health Chatbot</title>
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet"/>
+    <link href="/static/css/style.css" rel="stylesheet"/>
+
+    <!-- Google Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet"/>
+
+</head>
+<body>
+
+<!-- Navbar -->
+<nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm">
+    <div class="container">
+        <a class="navbar-brand fw-bold d-flex align-items-center" href="/">
+            <img src="/static/images/logo.jpeg" alt="Logo" class="logo me-2"> Female Health Chatbot
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto">
+                {% if session.user_id %}
+                <li class="nav-item"><a class="nav-link" href="/dashboard">Dashboard</a></li>
+                <li class="nav-item"><a class="nav-link" href="/chatbot">Chatbot</a></li>
+                <li class="nav-item"><a class="nav-link" href="/about">About</a></li>
+                <li class="nav-item">
+                    <form action="/logout" method="GET">
+                        <button class="btn btn-danger btn-sm">Logout</button>
+                    </form>
+                </li>
+                {% else %}
+                <li class="nav-item"><a class="nav-link" href="/login">Login</a></li>
+                <li class="nav-item"><a class="nav-link" href="/register">Register</a></li>
+                {% endif %}
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<!-- Chat Container -->
+<div class="chat-container">
+    <!-- Fixed Chat Header -->
+    <div class="chat-header">
+        <h5 class="m-0">Ask the Medical Chatbot</h5>
+    </div>
+
+    <!-- Chat Container -->
+    <div class="chat-body" id="chat-body">
+               <!-- Scrollable Chat Body -->
+        <div class="chat-message bot-message">
+            Welcome to the chatbot,
+            {% if user and user.firstname %}
+            {{ user.firstname }} {{ user.lastname }}!
+            {% else %}
+            Guest!
+            {% endif %}
+            How can I assist you today?
+        </div>
+        <!-- Chat messages will appear here -->
+    </div>
+
+    <!-- Chat Input & Send Button -->
+    <div class="chat-footer">
+        <label for="user-input"></label><input id="user-input" type="text" class="form-control"
+                                               placeholder="Type your message..." autocomplete="off"/>
+        <button id="send-btn" class="btn btn-primary">Send</button>
+    </div>
+
+</div>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+<script src="/static/js/script.js"></script>
+
+</body>
+</html>
