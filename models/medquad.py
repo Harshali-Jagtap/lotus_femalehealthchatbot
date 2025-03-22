@@ -24,8 +24,11 @@ class MedQuAD:
         user_vec = self.vectorizer.transform([question])
         similarities = cosine_similarity(user_vec, tfidf_matrix)
         max_idx = similarities.argmax()
-        return self.medquad_data[max_idx]["answer"] if similarities[0, max_idx] > 0.2 else None  # Changed to 0.2
-
+        # Increase similarity threshold to 0.5 and add keyword check
+        if similarities[0, max_idx] > 0.5 and any(
+                word in question.lower() for word in self.medquad_data[max_idx]["question"].lower().split()):
+            return self.medquad_data[max_idx]["answer"]
+        return None
 
 # ✅ Test the updated MedQuAD
 if __name__ == "__main__":

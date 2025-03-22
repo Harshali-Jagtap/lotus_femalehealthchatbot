@@ -1,11 +1,12 @@
+import os
+import jwt
+import bcrypt
 from flask import Blueprint, flash, request, render_template, session, jsonify, redirect, url_for
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 from datetime import datetime, timedelta, timezone
 from jwt import ExpiredSignatureError, InvalidTokenError
-import bcrypt
-import jwt
-import os
+
 from security.db import db_instance
 
 # Flask session secret key

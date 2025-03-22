@@ -1,10 +1,8 @@
-import json
-import random
 from flask import Blueprint, request, jsonify, render_template, session, redirect, url_for
 from security.db import db_instance
 from models.biobert import BioBERT
 from models.clinicalbert import ClinicalBERT
-from models.drugbank_parser import DrugBankParser
+from models.drugbank import DrugBank
 from models.medquad import MedQuAD
 from routes.auth import  users_collection
 from models.t5_summarizer import T5Simplifier
@@ -15,7 +13,7 @@ t5_simplifier = T5Simplifier()
 medquad = MedQuAD()
 biobert = BioBERT()
 clinicalbert = ClinicalBERT()
-drugbank = DrugBankParser()
+drugbank = DrugBank(simplifier=t5_simplifier)
 
 chatbot_bp = Blueprint("chatbot", __name__, template_folder="templates")
 
@@ -126,71 +124,121 @@ def save_chat_history(user_email, user_message, bot_response):
 #     return jsonify({"response": simplified})
 
 
+# @chatbot_bp.route("/chat", methods=["POST"])
+# def chat():
+#     user_message = request.json.get("message", "").lower().strip()
+#     raw_response = None
+#     print(f"\n🔍 User Query: '{user_message}'")
+#
+#     # Step 1: Check if the query is MEDICAL
+#     is_medical = any(keyword in user_message for keyword in
+#                      ["symptom", "pain", "drug", "fever", "hypertension", "dose"])
+#     print(f"🏥 Medical Query? {'✅' if is_medical else '❌'}")
+#
+#     if is_medical:
+#         print("\n🩺 Starting Medical Pipeline:")
+#         # Priority 1: MedQuAD
+#         medquad_response = medquad.search_medquad(user_message)
+#         if medquad_response:
+#             print(f"1️⃣ MedQuAD Answer: {medquad_response[:100]}...")
+#             raw_response = medquad_response
+#         else:
+#             print("1️⃣ MedQuAD: ❌ No match")
+#
+#         # Priority 2: DrugBank
+#         if not raw_response:
+#             drug_response = drugbank.get_drug_details(user_message)
+#             if drug_response and "No data" not in drug_response:
+#                 print(f"2️⃣ DrugBank Answer: {drug_response[:100]}...")
+#                 raw_response = drug_response
+#             else:
+#                 print("2️⃣ DrugBank: ❌ No match")
+#
+#         # Priority 3: ClinicalBERT
+#         if not raw_response and any(keyword in user_message for keyword in ["symptom", "pain", "ache"]):
+#             print("3️⃣ Trying ClinicalBERT...")
+#             raw_response = clinicalbert.analyze_symptoms(user_message)
+#             print(f"ClinicalBERT Answer: {raw_response[:100]}..." if raw_response else "3️⃣ ClinicalBERT: ❌ No match")
+#
+#         # Priority 4: BioBERT
+#         if not raw_response:
+#             print("4️⃣ Trying BioBERT...")
+#             raw_response = biobert.answer_question(user_message)
+#             print(f"BioBERT Answer: {raw_response[:100]}..." if raw_response else "4️⃣ BioBERT: ❌ No match")
+#
+#     # Non-medical path
+#     else:
+#         print("\n🌐 Non-Medical Query Path:")
+#         try:
+#             print("🤖 Asking OpenAI...")
+#             openai_assistant = OpenAIAssistant()
+#             raw_response = openai_assistant.get_safe_response(user_message)
+#             print(f"OpenAI Response: {raw_response[:100]}...")
+#         except Exception as e:
+#             print(f"❌ OpenAI Error: {e}")
+#             raw_response = "I couldn't find an answer. Please try another question."
+#
+#     # Response processing
+#     print("\n🔧 Processing Response:")
+#     if raw_response:
+#         if is_medical:
+#             print("⚕️ Simplifying medical response...")
+#             simplified = t5_simplifier.simplify(raw_response)
+#         else:
+#             simplified = raw_response
+#         print(f"📤 Final Response: {simplified[:120]}...")
+#     else:
+#         simplified = "I couldn't find an answer. Please try another question."
+#         print("📤 No valid responses found")
+#
+#     return jsonify({"response": simplified})
+
+
 @chatbot_bp.route("/chat", methods=["POST"])
 def chat():
     user_message = request.json.get("message", "").lower().strip()
     raw_response = None
-    print(f"\n🔍 User Query: '{user_message}'")
+    is_medical = False  # Reset logic
 
-    # Step 1: Check if the query is MEDICAL
-    is_medical = any(keyword in user_message for keyword in
-                     ["symptom", "pain", "drug", "fever", "hypertension", "dose"])
-    print(f"🏥 Medical Query? {'✅' if is_medical else '❌'}")
+    # --- Priority 1: MedQuAD ---
+    medquad_response = medquad.search_medquad(user_message)
+    if medquad_response:
+        print(f"1️⃣ MedQuAD Answer: {medquad_response[:100]}...")
+        raw_response = medquad_response
+        is_medical = True
 
-    if is_medical:
-        print("\n🩺 Starting Medical Pipeline:")
-        # Priority 1: MedQuAD
-        medquad_response = medquad.search_medquad(user_message)
-        if medquad_response:
-            print(f"1️⃣ MedQuAD Answer: {medquad_response[:100]}...")
-            raw_response = medquad_response
-        else:
-            print("1️⃣ MedQuAD: ❌ No match")
+    # --- Priority 2: DrugBank ---
+    if not raw_response:
+        drug_response = drugbank.get_drug_details(user_message)
+        if drug_response and "No data" not in drug_response:
+            print(f"2️⃣ DrugBank Answer: {drug_response[:100]}...")
+            raw_response = drug_response
+            is_medical = True
 
-        # Priority 2: DrugBank
-        if not raw_response:
-            drug_response = drugbank.get_drug_details(user_message)
-            if drug_response and "No data" not in drug_response:
-                print(f"2️⃣ DrugBank Answer: {drug_response[:100]}...")
-                raw_response = drug_response
-            else:
-                print("2️⃣ DrugBank: ❌ No match")
-
-        # Priority 3: ClinicalBERT
-        if not raw_response and any(keyword in user_message for keyword in ["symptom", "pain", "ache"]):
+    # --- Priority 3: ClinicalBERT/BioBERT ---
+    if not raw_response:
+        # Auto-detect symptom/disease queries
+        if any(keyword in user_message for keyword in ["symptom", "pain", "ache", "fever", "cough"]):
             print("3️⃣ Trying ClinicalBERT...")
             raw_response = clinicalbert.analyze_symptoms(user_message)
-            print(f"ClinicalBERT Answer: {raw_response[:100]}..." if raw_response else "3️⃣ ClinicalBERT: ❌ No match")
-
-        # Priority 4: BioBERT
-        if not raw_response:
+            is_medical = True
+        else:
             print("4️⃣ Trying BioBERT...")
             raw_response = biobert.answer_question(user_message)
-            print(f"BioBERT Answer: {raw_response[:100]}..." if raw_response else "4️⃣ BioBERT: ❌ No match")
+            is_medical = True if raw_response else False
 
-    # Non-medical path
-    else:
-        print("\n🌐 Non-Medical Query Path:")
+    # --- Fallback to OpenAI ---
+    if not raw_response:
+        print("🌐 No medical answers. Using OpenAI...")
         try:
-            print("🤖 Asking OpenAI...")
-            openai_assistant = OpenAIAssistant()
-            raw_response = openai_assistant.get_safe_response(user_message)
-            print(f"OpenAI Response: {raw_response[:100]}...")
-        except Exception as e:
-            print(f"❌ OpenAI Error: {e}")
+            raw_response = OpenAIAssistant().get_safe_response(user_message)
+        except:
             raw_response = "I couldn't find an answer. Please try another question."
 
-    # Response processing
-    print("\n🔧 Processing Response:")
-    if raw_response:
-        if is_medical:
-            print("⚕️ Simplifying medical response...")
-            simplified = t5_simplifier.simplify(raw_response)
-        else:
-            simplified = raw_response
-        print(f"📤 Final Response: {simplified[:120]}...")
+    # --- Simplify ONLY if response is medical and complex ---
+    if is_medical and ("Purpose:" not in raw_response):  # Skip simplification for DrugBank
+        simplified = t5_simplifier.simplify(raw_response)
     else:
-        simplified = "I couldn't find an answer. Please try another question."
-        print("📤 No valid responses found")
+        simplified = raw_response
 
     return jsonify({"response": simplified})

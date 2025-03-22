@@ -7,22 +7,21 @@ class T5Simplifier:
         self.model = T5ForConditionalGeneration.from_pretrained(model_name)
 
     def simplify(self, text):
-        input_text = text  # Better prompt
+        input_text = f"Simplify this medical text for a patient: {text}"  # Better prompt
         input_ids = self.tokenizer.encode(
             input_text,
             return_tensors="pt",
-            max_length=1000,
+            max_length=512,  # Reduced to avoid truncation
             truncation=True
         )
         simplified_ids = self.model.generate(
             input_ids,
-            max_length=1000,  # Increased from 150
+            max_length=150,  # Shorter output
             num_beams=4,
             early_stopping=True,
-            no_repeat_ngram_size=2  # Prevent repetitive phrases
+            no_repeat_ngram_size=3  # Reduce repetition
         )
         return self.tokenizer.decode(simplified_ids[0], skip_special_tokens=True)
-
 
 if __name__ == "__main__":
     simplifier = T5Simplifier()
