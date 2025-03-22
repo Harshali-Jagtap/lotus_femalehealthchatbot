@@ -12,9 +12,6 @@
 models_cache/
 
 #PyCharm
-*.iws
-*.iml
-*.ipr
 *.bin
 *.tar.gz
 *.h5
