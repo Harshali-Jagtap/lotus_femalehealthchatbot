@@ -50,7 +50,7 @@ model_path = "models_cache/clinicalbert"
 tokenizer = AutoTokenizer.from_pretrained(model_path)
 model = AutoModelForQuestionAnswering.from_pretrained(model_path)
 print("✅ ClinicalBERT Model Loaded Successfully!")
-```python
+```
 
 If it throws an error, download the correct models:
 # Run this in terminal or command prompt
