@@ -1,0 +1,30 @@
+# Virtual environment
+.venv/
+
+# PyCharm IDE
+.idea/
+*.iml
+/shelf/
+/workspace.xml
+
+# HTTP client requests
+/httpRequests/
+
+# Datasource config
+/dataSources/
+/dataSources.local.xml
+
+# Environment file
+.env
+
+# Python cache
+__pycache__/
+
+# Model cache folder of BioBERT and ClinicalBERT
+models_cache/
+
+# Large model files
+*.bin
+*.tar.gz
+*.h5
+*.msgpack
