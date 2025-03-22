@@ -10,3 +10,13 @@
 .env
 #Model_cache folder of Biobert and clinicalbert downloaded from Hugging Face
 models_cache/
+
+#PyCharm
+.idea
+*.iws
+*.iml
+*.ipr
+*.bin
+*.tar.gz
+*.h5
+*.msgpack
