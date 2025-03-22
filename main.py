@@ -61,5 +61,5 @@ def page_not_found(e):
     return render_template("404.html"), 404
 
 if __name__ == "__main__":
-    print("✅ Starting Flask server...")  # ✅ Add this to check if Flask starts
+    print("✅ Starting Flask server...")
     app.run(debug=True, use_reloader=False)
