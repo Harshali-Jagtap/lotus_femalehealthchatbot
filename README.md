@@ -66,21 +66,14 @@ In PyJWT v2+, exceptions like `ExpiredSignatureError` are located in the `jwt.ex
 
 ** Solution:**
 
-1. Replace incorrect import:
+1. The error will be in import:
 
     ```text
     # Wrong
     from jwt import ExpiredSignatureError, InvalidTokenError
     ```
 
-2. Use the correct import:
-
-    ```text
-    # Correct
-    from jwt.exceptions import ExpiredSignatureError, InvalidTokenError
-    ```
-
-3. Ensure PyJWT is up to date:
+2. Ensure PyJWT is up to date or re-install:
 
     ```bash
     pip install --upgrade PyJWT
