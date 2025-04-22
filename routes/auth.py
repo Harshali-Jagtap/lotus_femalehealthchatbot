@@ -23,7 +23,7 @@ limiter = Limiter(get_remote_address)
 
 # ===== Helper Functions =====
 
-# Check if user account is temporarily locked
+# Check if a user account is temporarily locked
 def is_account_locked(email):
     user = users_collection.find_one({"email": email})
     if user and "failed_attempts" in user:
@@ -37,7 +37,7 @@ def reset_failed_attempts(email):
     users_collection.update_one({"email": email}, {"$set": {"failed_attempts": 0, "lock_until": None}})
 
 
-# Increase failed login attempts and possibly lock account
+# Increase failed login attempts and possibly lock an account
 def increase_failed_attempts(email):
     user = users_collection.find_one({"email": email})
     if user:

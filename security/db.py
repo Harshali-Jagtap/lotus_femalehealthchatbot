@@ -1,4 +1,6 @@
 # ===== MongoDB Connection Setup using PyMongo =====
+import os
+
 from pymongo import MongoClient
 
 
@@ -23,9 +25,8 @@ class Database:
 
 
 # ===== MongoDB Configuration =====
-MONGO_URI = ("mongodb+srv://k00265900:1GEJF5UZmp3CGRXW@cluster0.kwssl.mongodb.net/?retryWrites=true&w=majority&appName"
-             "=Cluster0")
-DATABASE_NAME = "female_health_chatbot"
+MONGO_URI = os.getenv("MONGO_URI")
+DATABASE_NAME = os.getenv("DATABASE_NAME")
 
 # ===== Instantiate the Database for Global Use =====
 db_instance = Database(MONGO_URI, DATABASE_NAME)
