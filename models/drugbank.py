@@ -1,10 +1,16 @@
+# ===== Drug Bank Dataset (Json file) =====
 import json
 import os
-import pandas as pd
-from models.t5_summarizer import T5Simplifier
 
 
 class DrugBank:
+    """
+    Initialize DrugBank handler.
+
+    :param simplifier: Optional simplifier (e.g., T5) to make drug descriptions easier to understand
+    :param data_dir: Directory where drugbank.json is stored
+    """
+
     def __init__(self, simplifier=None, data_dir="data"):
         self.data = None
         self.simplifier = simplifier  # T5Simplifier instance
@@ -12,18 +18,26 @@ class DrugBank:
         self.drug_data = self.load_drugbank_data()
 
     def load_drugbank_data(self):
-        """Load data from drugbank.json"""
+        """
+        Load DrugBank data from JSON file
+        :return: List of drug records or None on failure
+        """
         try:
             with open(self.json_path, "r") as f:
                 data = json.load(f)
-            print(f"✅ Loaded {len(data)} drug entries from DrugBank.")
             return data
         except Exception as e:
-            print(f"❌ Error loading DrugBank data: {e}")
+            print(f"Error loading DrugBank data: {e}")
             return None
 
     def search_drug_info(self, drug_name):
-        """Search for drug and simplify its description"""
+        """
+        Search for partial matches of a drug name and optionally simplify descriptions.
+
+        :param drug_name: Drug name or partial term to look for
+        :return: List of matching drugs with simplified descriptions
+        """
+
         if not self.drug_data:
             return "DrugBank data not available."
 
@@ -42,16 +56,29 @@ class DrugBank:
         return matches
 
     def get_drug_details(self, drug_name):
-        """Get simplified drug details for layman"""
+        """
+        Return a formatted string of a drug's purpose and category, with optional simplification.
+
+        Filters out clearly invalid/multi-word terms.
+
+        :param drug_name: Exact name of the drug
+        :return: Cleaned string response or None if not found
+        """
+
         if not self.drug_data:
             return "DrugBank data not available."
 
-        drug = next((d for d in self.drug_data if d["name"].lower() == drug_name.lower()), None)
+        # Strict filtering: reject multi-word queries that are clearly not a drug name
+        if len(drug_name.strip().split()) > 2 or any(term in drug_name.lower() for term in [
+            "for", "to", "help", "medicine", "relief", "symptom", "pain", "treatment", "how", "what"
+        ]):
+            return None
 
+        # Try to match drug name exactly
+        drug = next((d for d in self.drug_data if d["name"].lower() == drug_name.lower()), None)
         if not drug:
             return None
 
-        # Simplify medical jargon
         simplified = self.simplifier.simplify(drug["description"]) if self.simplifier else drug["description"]
 
         return (

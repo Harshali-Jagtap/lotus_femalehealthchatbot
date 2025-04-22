@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>GDPR Consent</title>
+</head>
+<body>
+    <h2>We Respect Your Privacy</h2>
+    <p>We use cookies and process your data to improve the Lotus experience. Please consent to continue.</p>
+    <form method="POST" action="{{ url_for('gdpr.consent') }}">
+        <button type="submit">I Consent</button>
+    </form>
+</body>
+</html>

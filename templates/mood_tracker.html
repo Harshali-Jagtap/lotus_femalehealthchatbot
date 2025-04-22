@@ -1,0 +1,39 @@
+<!-- ========== MOOD TRACKER SECTION ========== -->
+<div class="container my-5">
+    <!-- Section Title -->
+    <h3 class="text-center text-primary mb-4"> ☺️ Mood Tracker Summary 📋</h3>
+
+    <!-- ===== Mood Logs Table ===== -->
+    <hr class="my-4">
+    <h5 class="text-center">🗓️ Recent Mood Logs</h5>
+    <table class="table table-bordered table-striped mt-3 text-center">
+        <thead class="table-light">
+        <tr>
+            <th>Date</th>
+            <th>Mood</th>
+            <th>Habits</th>
+            <th>Notes</th>
+        </tr>
+        </thead>
+        <tbody id="moodTableBody">
+        <!-- mood_tracker.js will dynamically insert user's mood log entries here -->
+        </tbody>
+
+    </table>
+
+    <!-- ===== Mood Analytics Graph ===== -->
+    <hr class="my-4">
+    <h5 class="text-center">📈 Mood Analytics</h5>
+    <!-- Bar chart rendered by Chart.js -->
+    <canvas id="moodBarChart" height="120"></canvas>
+
+    <div class="alert alert-info mt-3" id="prediction">
+        <!-- JS will show personalized insight here -->
+    </div>
+
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/moment@2.29.4/min/moment.min.js"></script>
+<script src="/static/js/mood_tracker.js"></script>

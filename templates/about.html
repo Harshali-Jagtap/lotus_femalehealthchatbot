@@ -1,54 +1,218 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <!-- Meta Tags: Setup character encoding and responsive behavior -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Page Title -->
     <title>About Us - Female Health Chatbot</title>
-    <!-- Bootstrap CSS -->
+
+    <!-- Bootstrap CSS (for styling and responsive layout) -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
-    <link rel="stylesheet" href="/static/css/style.css"> <!-- Custom CSS -->
+
+    <!-- Bootstrap Icons (for UI icons like arrows, alerts, etc.) -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css">
+
+    <!-- Custom Site Styles -->
+    <link rel="stylesheet" href="/static/css/style.css">
 </head>
 <body>
 
-    <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-light shadow-sm">
-        <div class="container">
-            <a class="navbar-brand fw-bold d-flex align-items-center" href="/">
-                <img src="/static/images/logo.jpeg" alt="Logo" class="logo me-2"> <!-- Logo -->
-                Female Health Chatbot
-            </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
-                    <li class="nav-item"><a class="nav-link" href="/">Home</a></li>
-                    <li class="nav-item"><a class="nav-link" href="/login">Login</a></li>
-                    <li class="nav-item"><a class="nav-link" href="/register">Register</a></li>
-                </ul>
+<!-- Include shared Navbar (Jinja template) -->
+{% include 'navbar.html' %}
+
+<!-- ========== ABOUT PAGE SECTIONS ========== -->
+<div class="about-page-wrapper">
+
+    <!-- 💡 Section: Mission Statement -->
+    <!-- Purpose: Explains the goal and philosophy behind Lotus -->
+    <div class="about-section card-fade">
+        <div class="about-card" data-icon="🌸">
+            <h4>Our Mission</h4>
+            <p>Lotus was created to make women’s health and wellbeing support more accessible, inclusive, and
+                stigma-free — especially for students. It’s a private, always-on companion offering guidance,
+                encouragement, and trustworthy information.</p>
+        </div>
+    </div>
+
+    <!-- 👩‍💻 Section: Meet the Creator -->
+    <!-- Introduction from the developer of Lotus and her inspiration -->
+    <div class="about-section card-fade">
+        <div class="about-card" data-icon="👩‍💻">
+            <h4>Meet the Creator</h4>
+            <p>Hi! I’m Harshali, the creator of Lotus. As a student, I realized how hard it can be to ask for help —
+                especially when it comes to topics like periods, anxiety, or hormones. Lotus is my way of offering a
+                safe space, backed by tech and care.</p>
+        </div>
+    </div>
+
+    <!-- ⚙️ Section: How It Works -->
+    <!-- Explains step-by-step how the chatbot understands and replies -->
+    <div class="about-section card-fade">
+        <div class="about-card" data-icon="⚙️">
+            <h4>How It Works</h4>
+            <ul class="how-it-works-steps">
+                <li>💬 <strong>You Ask</strong> – A question about health, mood, or support.</li>
+                <li>🔍 <strong>Lotus Understands</strong> – It uses natural language to interpret your intent.</li>
+                <li>🧠 <strong>It Searches</strong> – Medical databases like MedQuAD & DrugBank (with strict fallback
+                    rules).
+                </li>
+                <li>✅ <strong>You Get Support</strong> – Friendly, non-judgmental info & advice.</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- 📈 Section: Future Plans -->
+    <!-- Lists upcoming goals like app launch, multilingual support -->
+    <div class="about-section card-fade">
+        <div class="about-card" data-icon="📈">
+            <h4>Where We're Going</h4>
+            <p>We're planning to launch a mobile version, add local language support, introduce cycle syncing, and
+                expand to more universities. Lotus is growing — just like you.</p>
+        </div>
+    </div>
+
+    <!-- 🔒 Section: Privacy and Ethics -->
+    <!-- Ensures users that Lotus is non-judgmental, private, secure -->
+    <div class="about-section card-fade">
+        <div class="about-card" data-icon="🔒">
+            <h4>Privacy & Safety First</h4>
+            <p>No personal data is saved. Lotus provides information, not diagnosis. All responses are generated
+                ethically and filtered for sensitive care.</p>
+        </div>
+    </div>
+
+    <!-- 💬 Section: Student Testimonials -->
+    <!-- Quotes from real or mock students on how Lotus helped them -->
+    <div class="about-section card-fade">
+        <div class="about-card" data-icon="💬">
+            <h4>What Students Say</h4>
+            <div class="testimonial-wall">
+                <div class="testimonial">“Lotus helped me calm down before an exam. It was like talking to someone who
+                    gets it.”
+                </div>
+                <div class="testimonial">“I didn’t know what to do about my period pain at night — Lotus reassured me
+                    instantly.”
+                </div>
+                <div class="testimonial">“I was too shy to ask anyone about contraception. Lotus made it feel okay.”
+                </div>
             </div>
         </div>
-    </nav>
+    </div>
 
-    <!-- About Section -->
-    <section class="container my-5 text-center">
-        <h2 class="fw-bold text-primary">About Us</h2>
-        <p class="lead text-muted">
-            The Female Health Chatbot is designed to provide quick, reliable, and confidential health insights for women.
-            Our goal is to bridge the gap in women's healthcare by offering AI-powered, instant responses to common medical inquiries.
-        </p>
-        <img src="/static/images/about.png" alt="About Image" class="img-fluid rounded shadow-sm" style="max-width: 80%;">
-    </section>
-
-    <!-- Footer -->
-    <footer class="footer bg-dark text-white py-4">
-        <div class="container text-center">
-            <p class="mb-1">© 2024 Female Health Chatbot. All Rights Reserved.</p>
+    <!-- ⏳ Section: Timeline of Development -->
+    <!-- Visual steps showing project milestones -->
+    <div class="about-section card-fade">
+        <div class="about-card" data-icon="⏳">
+            <h4>Journey So Far</h4>
+            <div class="timeline">
+                <div class="step">🪷 Idea Born</div>
+                <div class="step">💻 Coding & Backend</div>
+                <div class="step">🧠 Integrated AI</div>
+                <div class="step">🎨 UI Design</div>
+                <div class="step">🚀 Launch</div>
+            </div>
         </div>
-    </footer>
+    </div>
 
-    <!-- Bootstrap Bundle with Popper -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- 💡 Section: Tech Stack -->
+    <!-- Shows technologies used: Flask, OpenAI, MongoDB, etc. -->
+    <div class="about-section card-fade">
+        <div class="about-card" data-icon="💡">
+            <h4>Technologies Used</h4>
+            <div class="tech-icons">
+                <span>💬 OpenAI</span>
+                <span>🌐 HTML + CSS</span>
+                <span>⚙️ Flask</span>
+                <span>🧩 JavaScript</span>
+                <span>🗃️ MongoDB</span>
+                <span>📄 MedQuAD + DrugBank</span>
+            </div>
+        </div>
+    </div>
 
+    <!-- 🎯 Section: Final Call-to-Action -->
+    <!-- Encourages the user to try the chatbot -->
+    <div class="about-section card-fade">
+        <div class="about-card" data-icon="🎯">
+            <h4>Ready to Try Lotus?</h4>
+            <p>Whether you're curious or seeking support, Lotus is just one click away. Get instant help, tips, or
+                reassurance in a private space made for you.</p>
+            <a href="/chatbot" class="btn btn-primary mt-3">💬 Open Chatbot</a>
+        </div>
+    </div>
+
+    <!-- ========== ACCORDION: Core Services ========== -->
+    <!-- Expandable accordion listing chatbot’s full capabilities -->
+    <div class="accordion-box">
+        <!-- Services include: Medical Info, Mental Health, Campus Support, etc. -->
+        <h4 class="text-center mb-3">🌸 Core Services Offered by Lotus</h4>
+
+        <div class="accordion-item">
+            <button class="accordion-toggle">1️⃣ Medical Information & Guidance</button>
+            <div class="accordion-content">
+                <p>General advice on menstrual health, pregnancy, fertility, contraceptives, and hormonal health.</p>
+                <p>Education about common conditions like PCOS, endometriosis, UTI, yeast infections, etc.</p>
+                <p>Non-diagnostic support for symptoms (e.g., “What could cause lower abdominal pain?”).</p>
+            </div>
+        </div>
+
+        <div class="accordion-item">
+            <button class="accordion-toggle">2️⃣ Medication Info</button>
+            <div class="accordion-content">
+                <p>Details on common medications like paracetamol, birth control pills, etc.</p>
+                <p>Side effects, dosage guidelines, and usage warnings.</p>
+                <p>Caution for interactions with female-specific medications.</p>
+            </div>
+        </div>
+
+        <div class="accordion-item">
+            <button class="accordion-toggle">3️⃣ Mental Health & Wellness</button>
+            <div class="accordion-content">
+                <p>Tips for stress relief, emotional well-being, and mindfulness.</p>
+                <p>Guidance on PMS mood swings, postpartum depression, anxiety.</p>
+                <p>Encouragement and supportive resources.</p>
+            </div>
+        </div>
+
+        <div class="accordion-item">
+            <button class="accordion-toggle">4️⃣ Period & Cycle Awareness</button>
+            <div class="accordion-content">
+                <p>Educates users on menstrual cycle phases.</p>
+                <p>General info on tracking, irregularities, and hygiene.</p>
+            </div>
+        </div>
+
+        <div class="accordion-item">
+            <button class="accordion-toggle">5️⃣ FAQ and Triage Assistant</button>
+            <div class="accordion-content">
+                <p>Answers common health-related FAQs.</p>
+                <p>Directs users to appropriate departments or links (e.g., women’s clinics, counselors).</p>
+                <p>It Could include links to TUS medical services or emergency helplines if implemented.</p>
+            </div>
+        </div>
+
+        <div class="accordion-item">
+            <button class="accordion-toggle">6️⃣ Canteen & Campus Support</button>
+            <div class="accordion-content">
+                <p>Menstrual-friendly food suggestions if connected with the canteen feature.</p>
+                <p>Directs students to campus resources (pads/tampons, health rooms).</p>
+            </div>
+
+            <!-- Final Note for Clarity and Scope -->
+            <div class="about-highlight mt-4">
+                <p><strong>✅ Important Notes</strong><br>
+                    Lotus is <u>not a replacement</u> for medical advice from professionals.<br>
+                    It’s designed to provide educational, supportive, and confidential responses.<br>
+                    Enhances accessibility to female health education 24/7.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<br>
+<!-- Include shared Footer from Jinja template -->
+{% include "footer.html" %}
 </body>
 </html>

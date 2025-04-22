@@ -1,0 +1,199 @@
+<div class="container">
+    <!-- ===== Calendar Controls: Search & Filter Dropdown ===== -->
+    <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+        <!-- Input to filter events by title -->
+        <input type="text" id="searchEventInput" class="form-control form-control-sm w-50"
+               placeholder="Search event title...">
+        <!-- Dropdown to filter events by category -->
+        <select id="categoryFilter" class="form-select form-select-sm w-25">
+            <option value="">All Categories</option>
+            <option value="Work">Work</option>
+            <option value="Health">Health</option>
+            <option value="Academic">Academic</option>
+            <option value="Personal">Personal</option>
+        </select>
+
+    </div>
+
+    <!-- ===== Calendar View ===== -->
+    <div id="calendar"></div>
+
+    <!-- ===== Modal: Add New Event ===== -->
+    <div id="eventFormModal" class="lotus-modal">
+        <div class="lotus-modal-content">
+            <span class="close-modal" onclick="document.getElementById('eventFormModal').classList.remove('active')">&times;</span>
+            <div class="event-form-box">
+                <h5 class="text-center text-pink mb-3" style="font-weight: bold;">Add New Event</h5>
+                <!-- Form to create a new calendar event -->
+                <form id="eventForm">
+                    <div class="mb-2">
+                        <label class="form-label text-muted">Event Title</label>
+                        <input type="text" class="form-control form-control-sm custom-input" id="eventTitle" required>
+                    </div>
+                    <div class="mb-2">
+                        <label class="form-label text-muted">Event Time (optional)</label>
+                        <input type="time" class="form-control form-control-sm custom-input" id="eventTime">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label text-muted">Category</label>
+                        <select id="eventCategory" class="form-select form-select-sm custom-input">
+                            <option value="General">General</option>
+                            <option value="Work">Work</option>
+                            <option value="Health">Health</option>
+                            <option value="Academic">Academic</option>
+                            <option value="Personal">Personal</option>
+                        </select>
+                    </div>
+                    <input type="hidden" id="eventDate">
+                    <div class="d-flex justify-content-center gap-2 mt-2">
+                        <button type="submit" class="btn btn-sm btn-pink">Save</button>
+                        <button type="button" id="cancelEventBtn" class="btn btn-sm btn-outline-secondary">Cancel
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== Modal: Event Details ===== -->
+    <div id="eventDetailsModal" class="lotus-modal">
+        <div class="lotus-modal-content">
+            <span class="close-modal" onclick="document.getElementById('eventDetailsModal').classList.remove('active')">&times;</span>
+            <div class="event-form-box">
+                <!-- Displays event info; allows edit/delete -->
+                <h5 class="text-center text-pink mb-3" style="font-weight: bold;">Event Details</h5>
+                <p><strong>Title:</strong> <span id="eventTitleDisplay"></span></p>
+                <p><strong>Date:</strong> <span id="eventDateDisplay"></span></p>
+                <p><strong>Category:</strong> <span id="eventCategoryDisplay"></span></p>
+                <div id="deleteEventContainer" class="mt-2" style="display:none;">
+                    <p class="text-danger fw-semibold">Are you sure you want to delete this event?</p>
+                    <div class="d-flex justify-content-center gap-2">
+                        <button id="confirmDeleteEventBtn" class="btn btn-sm btn-danger">Yes</button>
+                        <button id="cancelDeleteEventBtn" class="btn btn-sm btn-outline-secondary">Cancel</button>
+                    </div>
+                </div>
+                <div class="d-flex justify-content-center gap-2 mt-3 event-action-buttons">
+                    <button id="editEventBtn" class="btn btn-sm btn-warning">Edit</button>
+                    <button id="deleteEventBtn" class="btn btn-sm btn-danger">Delete</button>
+                    <button id="closeDetailsBtn" class="btn btn-sm btn-secondary"
+                            onclick="document.getElementById('eventDetailsContainer').style.display='none'">Close
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== Modal: Edit Existing Event ===== -->
+    <div id="editEventModal" class="lotus-modal">
+        <div class="lotus-modal-content">
+            <span class="close-modal" onclick="document.getElementById('editEventModal').classList.remove('active')">&times;</span>
+            <div class="event-form-box">
+                <h5 class="text-center text-pink mb-3" style="font-weight: bold;">Edit Event</h5>
+                <!-- Form to update event title and category -->
+                <form id="editEventForm">
+                    <div class="mb-2">
+                        <label class="form-label text-muted">New Title</label>
+                        <input type="text" id="editEventTitle" class="form-control form-control-sm custom-input">
+                    </div>
+                    <div class="mb-2">
+                        <label class="form-label text-muted">New Category</label>
+                        <select id="editEventCategory" class="form-select form-select-sm custom-input">
+                            <option value="General">General</option>
+                            <option value="Work">Work</option>
+                            <option value="Health">Health</option>
+                            <option value="Academic">Academic</option>
+                            <option value="Personal">Personal</option>
+                        </select>
+                    </div>
+                    <div class="d-flex justify-content-center gap-2 mt-2">
+                        <button id="saveEditEventBtn" type="button" class="btn btn-sm btn-success">Save</button>
+                        <button id="cancelEditEventBtn" type="button" class="btn btn-sm btn-outline-secondary">Cancel
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== Modal: Actions on Date Click ===== -->
+    <input type="hidden" id="selectedDateStorage">
+
+    <div id="dateOptionsModal" class="lotus-modal">
+        <!-- Lets user add event or mood entry for selected date -->
+        <div class="lotus-modal-content text-center">
+            <span class="close-modal" onclick="document.getElementById('dateOptionsModal').classList.remove('active')">&times;</span>
+            <h5 class="mb-3">Choose an action for <span id="selectedDateLabel" class="text-primary fw-bold"></span></h5>
+            <button class="btn btn-success me-2 mb-2" onclick="openEventFormFromDate()">➕ Add Event</button>
+            <button class="btn btn-info mb-2" onclick="openMoodTrackerFromDate()">🧠 Add Daily Activities</button>
+
+        </div>
+    </div>
+
+    <!-- ===== Modal: Mood Tracker Input ===== -->
+    <div id="moodTrackerModal" class="lotus-modal">
+        <div class="lotus-modal-content">
+            <span class="close-modal" onclick="document.getElementById('moodTrackerModal').classList.remove('active')">&times;</span>
+            <h6 id="moodDateLabel" class="text-muted text-center mb-3"></h6>
+
+            <div class="card">
+                <!-- Mood Buttons: Choose mood emojis -->
+                <!-- Habit Buttons: Activities done that day -->
+                <!-- Notes Textarea -->
+                <!-- Save Button + Status Message -->
+                <h2 class="text-center fw-bold mb-4"> Mood Tracker 🤔🧐🤨</h2>
+                <h5 class="text-center fw-bold text-danger">Select Your Mood(s)</h5>
+                <div id="moodButtons" class="d-flex flex-wrap gap-3 mb-4">
+                    <button class="btn btn-outline-primary" data-mood="happy">😊 Happy</button>
+                    <button class="btn btn-outline-primary" data-mood="neutral">😐 Neutral</button>
+                    <button class="btn btn-outline-primary" data-mood="sad">😔 Sad</button>
+                    <button class="btn btn-outline-primary" data-mood="anxious">😰 Anxious</button>
+                    <button class="btn btn-outline-primary" data-mood="energetic">🤩 Energetic</button>
+                    <button class="btn btn-outline-primary" data-mood="frisky">😏 Frisky</button>
+                    <button class="btn btn-outline-primary" data-mood="mood swings">😵‍💫 Mood Swings</button>
+                    <button class="btn btn-outline-primary" data-mood="low energy">😩 Low Energy</button>
+                    <button class="btn btn-outline-primary" data-mood="irritated">😠 Irritated</button>
+                    <button class="btn btn-outline-primary" data-mood="emptiness">😶‍🌫️ Emptiness</button>
+                </div>
+
+                <!-- Habit Buttons -->
+                <h5 class="text-center fw-bold text-success">What Habits Did You Do?</h5>
+                <div id="habitButtons" class="d-flex flex-wrap gap-3 mb-4">
+                    <button class="btn btn-outline-success" data-habit="meditation">🧘 Meditation</button>
+                    <button class="btn btn-outline-success" data-habit="yoga">🧘 Yoga</button>
+                    <button class="btn btn-outline-success" data-habit="travel">🏃 Travel</button>
+                    <button class="btn btn-outline-success" data-habit="water activities">🌊 Water Activities</button>
+                    <button class="btn btn-outline-success" data-habit="journaling">📓 Journaling</button>
+                    <button class="btn btn-outline-success" data-habit="alcohol">🍷 Alcohol</button>
+                    <button class="btn btn-outline-success" data-habit="gym">🏋️‍♂️ GYM</button>
+                </div>
+
+                <!-- Notes -->
+                <h5 class="text-center text-muted">Describe how you're feeling</h5>
+                <div class="mb-4">
+                    <textarea id="symptomNotes" class="form-control" rows="3"
+                              placeholder="e.g., I feel dizzy and exhausted."></textarea>
+                </div>
+
+                <!-- Save -->
+                <div class="text-end">
+                    <button class="btn btn-lg btn-pink px-4 py-2" onclick="saveMood()">Save Entry</button>
+                    <small id="moodSaveStatus" class="text-muted d-block mt-2 text-center"></small>
+                </div>
+                <input type="hidden" id="calendarMoodDate">
+            </div>
+        </div>
+    </div>
+</div>
+<!-- ===== Toast Notification: Action Completed Confirmation ===== -->
+<div class="position-fixed bottom-0 end-0 p-3" style="z-index: 1055;">
+    <div id="eventToast" class="toast align-items-center text-bg-success border-0" role="alert" aria-live="assertive"
+         aria-atomic="true">
+        <div class="d-flex">
+            <div class="toast-body">Action completed!</div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/moment@2.29.4/min/moment.min.js"></script>
+<script src="/static/js/calendar.js"></script>

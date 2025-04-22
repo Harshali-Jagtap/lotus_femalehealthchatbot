@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Meta Tags: Setup character encoding and responsive behavior -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Page Title -->
+    <title>Mental Health - Female Health Chatbot</title>
+
+    <!-- Bootstrap CSS (for styling and responsive layout) -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+
+    <!-- Bootstrap Icons (for UI icons like arrows, alerts, etc.) -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css">
+
+    <!-- Custom Site Styles -->
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+
+<!-- Include shared Navbar (Jinja template) -->
+{% include 'navbar.html' %}
+
+<!-- ========== MENTAL HEALTH MAIN SECTION ========== -->
+<section class="container my-5 text-center">
+
+    <!-- Main Heading -->
+    <h2 class="fw-bold text-primary">Mental Health</h2>
+    <p class="lead text-muted align-left">
+
+        <!-- ===== Introduction to Mental Health Importance ===== -->
+    <div class="mt-4 text-start">
+        <h4 class="text-secondary mb-3">Why Mental Health Support Matters 💡</h4>
+        <!-- Paragraphs explaining emotional struggles and Lotus support -->
+        <p>
+            Many women silently battle anxiety, stress, postpartum depression, and hormonal shifts — often without
+            the support they truly deserve. Daily responsibilities, social expectations, and physical changes can
+            take a toll on mental wellbeing. Yet due to stigma or lack of accessible resources, emotional struggles
+            are frequently kept hidden. </p>
+
+        <p>
+            Lotus creates a safe and compassionate space where you can feel genuinely heard and supported — without
+            judgment or
+            pressure. Whether you're navigating mood swings, sleep difficulties, or overwhelming thoughts, Lotus is
+            here to offer calming guidance, evidence-based techniques, and kind words when you need them most.
+            You're not alone, and your mental health matters. </p>
+
+        <!-- ===== Self-Help Techniques (Visual Cards) ===== -->
+        <h4 class="text-secondary mt-5 mb-3">Self-Help Techniques</h4>
+        <div class="techniques-visuals">
+            <!-- 1. Breathing Exercise -->
+            <!-- 2. Grounding Technique: 5-4-3-2-1 method -->
+            <!-- 3. Guided Calm: YouTube Meditation embeds -->
+            <div class="technique-box">
+                <h5>Breathing Exercise</h5>
+                <br><br>
+
+                <img src="/static/images/breathing.png" alt="Breathing Cartoon and Guide"
+                     class="breathing-image-large">
+            </div>
+
+            <div class="technique-box">
+                <h5>Grounding Technique</h5>
+                <div class="grounding-grid">
+                    <div class="grounding-card delay-1">
+                        <img src="/static/images/eyes_animation.gif" alt="See" class="grounding-icon">
+                        <p>5. things you can <strong>see</strong></p>
+                    </div>
+                    <div class="grounding-card">
+                        <img src="/static/images/open_hand.jpeg" alt="Touch" class="grounding-icon">
+                        <p>4. things you can <strong>touch</strong></p>
+                    </div>
+                    <div class="grounding-card">
+                        <img src="/static/images/ears.jpeg" alt="Hear" class="grounding-icon">
+                        <p>3. things you can <strong>hear</strong></p>
+                    </div>
+                    <div class="grounding-card">
+                        <img src="/static/images/human_nose.jpeg" alt="Smell" class="grounding-icon">
+                        <p>2. things you can <strong>smell</strong></p>
+                    </div>
+                    <div class="grounding-card">
+                        <img src="/static/images/mouth.jpeg" alt="Taste" class="grounding-icon">
+                        <p>1. thing you can <strong>taste</strong></p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="technique-box">
+                <h5>Guided Calm</h5>
+                <div class="pulse-ring"></div>
+                <div class="video-wrapper mt-3">
+                    <iframe width="100%" height="200"
+                            src="https://www.youtube.com/embed/inpok4MKVLM?rel=0&autoplay=0&mute=0"
+                            title="Guided Meditation" frameborder="0"
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                            allowfullscreen></iframe>
+                </div>
+                <div class="video-wrapper mt-3">
+                    <iframe width="100%" height="200"
+                            src="https://www.youtube.com/embed/rkZl2gsLUp4?rel=0&autoplay=0&mute=0"
+                            title="Guided Meditation" frameborder="0"
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                            allowfullscreen></iframe>
+                </div>
+            </div>
+        </div>
+
+        <br>
+
+        <!-- ===== Layout: Emergency Support + Tips ===== -->
+        <div class="mental-health-layout">
+            <!-- Left Column: Emergency Helplines -->
+            <div class="mh-left">
+                <h5>Emergency Support</h5>
+                <div class="support-card-grid">
+                    <!-- Each support card expands on click to show contact info -->
+                    <div class="support-card" onclick="toggleCard(this)">
+                        <div class="support-card-header">
+                            <h6>Samaritans (Ireland)</h6>
+                        </div>
+                        <div class="support-card-body">
+                            <p><strong>Call 116 123</strong></p>
+                            <p>Free 24/7 confidential support for anyone in distress.</p>
+                        </div>
+                    </div>
+
+                    <div class="support-card" onclick="toggleCard(this)">
+                        <div class="support-card-header">
+                            <h6>Mind (UK)</h6>
+                        </div>
+                        <div class="support-card-body">
+                            <p><strong>Call 0300 123 3393</strong></p>
+                            <p>Mental health support (Mon–Fri, 9am–6pm).</p>
+                        </div>
+                    </div>
+
+                    <div class="support-card" onclick="toggleCard(this)">
+                        <div class="support-card-header">
+                            <h6>Text About It</h6>
+                        </div>
+                        <div class="support-card-body">
+                            <p><strong>Text HELLO to 50,808</strong></p>
+                            <p>Free anonymous support by trained volunteers.</p>
+                        </div>
+                    </div>
+
+                    <div class="support-card" onclick="toggleCard(this)">
+                        <div class="support-card-header">
+                            <h6>Befrienders Worldwide</h6>
+                        </div>
+                        <div class="support-card-body">
+                            <p><a href="https://www.befrienders.org" target="_blank">Visit Website</a></p>
+                            <p>Find support centers worldwide.</p>
+                        </div>
+                    </div>
+
+                    <div class="support-card" onclick="toggleCard(this)">
+                        <div class="support-card-header">
+                            <h6>Aware</h6>
+                        </div>
+                        <div class="support-card-body">
+                            <p><strong>1800 80 48 48</strong>, 10am–10pm</p>
+                            <p>Support for anxiety, depression, person with bipolar disorder and families.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column: Tips for Wellbeing + When to Seek Help -->
+            <div class="mh-right">
+                <!-- Daily Wellbeing Tips (simple habits list) -->
+                <div class="wellbeing-section">
+                    <h5>Tips for Daily Wellbeing</h5>
+                    <ul>
+                        <li>Start your day with a walk in fresh air</li>
+                        <li>Stay hydrated and eat nourishing meals</li>
+                        <li>Limit social media & screen time</li>
+                        <li>Try journaling or mindfulness exercises</li>
+                    </ul>
+                </div>
+
+                <!-- When to Seek Help signs (list format) -->
+                <div class="help-section">
+                    <h5>When Should You Seek Help?</h5>
+                    <ul>
+                        <li>You feel persistently down, anxious, or overwhelmed</li>
+                        <li>Your sleep or appetite is disrupted</li>
+                        <li>You withdraw from people or daily activities</li>
+                        <li>You need someone to talk to</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== Second Grid: Affirmations + Myths ===== -->
+        <div class="mental-health-secondary-grid">
+            <div class="top-row">
+                <!-- Positive Affirmation Generator -->
+                <div class="affirmation-box">
+                    <!-- Button triggers JS to show a random affirmation -->
+                    <h5>Positive Affirmations</h5>
+                    <div class="affirmation-generator text-center">
+                        <p id="affirmation-text" class="affirmation">Click below for your affirmation </p> <br>
+                        <button onclick="generateAffirmation()" class="btn btn-primary mt-2">Show Affirmation</button>
+                    </div>
+                </div>
+
+                <!-- Myths vs. Facts (slide-style cards with navigation) -->
+                <div class="myth-box">
+                    <!-- Educational breakdown of mental health myths and truths -->
+                    <h5>Myths vs. Facts</h5>
+                    <div class="myth-slider-container">
+                        <div class="myth-slider" id="mythSlider">
+                            <div class="myth-slide active">
+                                <h6>Myth ❌</h6>
+                                <p>Mental illness is a sign of weakness.</p>
+                                <h6 class="mt-3">Fact ✅</h6>
+                                <p>It’s a health condition that can affect anyone.</p>
+                            </div>
+                            <div class="myth-slide">
+                                <h6>Myth ❌</h6>
+                                <p>Only adults face anxiety or depression.</p>
+                                <h6 class="mt-3">Fact ✅</h6>
+                                <p>Youth and students experience it too.</p>
+                            </div>
+                            <div class="myth-slide">
+                                <h6>Myth ❌</h6>
+                                <p>Talking about mental health makes it worse.</p>
+                                <h6 class="mt-3">Fact ✅</h6>
+                                <p>Talking openly helps reduce stigma and invites support.</p>
+                            </div>
+                            <div class="myth-slide">
+                                <h6>Myth ❌</h6>
+                                <p>If someone looks fine, they’re not struggling.</p>
+                                <h6 class="mt-3">Fact ✅</h6>
+                                <p>Mental health issues aren’t always visible.</p>
+                            </div>
+                            <div class="myth-slide">
+                                <h6>Myth ❌</h6>
+                                <p>Having a mental illness means you are “crazy.”</p>
+                                <h6 class="mt-3">Fact ✅</h6>
+                                <p> It's plain and simple, having a mental illness does not mean you are “crazy.”
+                                    It means you are vulnerable. It means you have an illness with challenging symptoms
+                                    — the same as someone with an illness like diabetes. While mental illness might
+                                    alter your thinking, destabilize your moods or skew your perception of reality,
+                                    that doesn’t mean you are “crazy.” It means you are human and are susceptible to
+                                    sickness and illness, the same as any other person. </p>
+                            </div>
+                            <div class="myth-slide">
+                                <h6>Myth ❌</h6>
+                                <p>People with mental illness are violent and dangerous.</p>
+                                <h6 class="mt-3">Fact ✅</h6>
+                                <p>Within the last few years, the U.S. has had an increase in mass violence.
+                                    Whenever these tragedies take place, the media is quick to judge the suspects and
+                                    label them as “mentally disturbed” or “mentally ill.” In reality, hate is not a
+                                    mental illness. Only 5% of violent crimes in the U.S. are committed by people with
+                                    serious mental illness.</p>
+                            </div>
+                            <div class="myth-slide">
+                                <h6>Myth ❌</h6>
+                                <p>Seeking help for mental illness will lead to being ostracized and make symptoms
+                                    worse.</p>
+                                <h6 class="mt-3">Fact ✅</h6>
+                                <p>I know it’s hard to come out to anyone about having a mental illness, especially
+                                    because they’re so commonly misunderstood. People who are unfamiliar with mental
+                                    illness tend to think that people are the way they are because of nature,
+                                    personality or attitude. But when you do have the strength, courage and bravery
+                                    to open up to someone else, you are working to alleviate the stigma, increase
+                                    awareness, empower yourself, grow as a person, and promote understanding of mental
+                                    health. So don’t let others perceptions scare you from getting the help you
+                                    need.</p>
+                            </div>
+                        </div>
+                        <div class="myth-slider-buttons">
+                            <button onclick="slideMyths(-1)">←</button>
+                            <button onclick="slideMyths(1)">→</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ===== Downloadable PDF Resources ===== -->
+            <h5>Downloadable Resources</h5>
+            <div class="resource-card-grid">
+                <!-- Each card links to an external PDF (WHO, HSE, Journals, etc.) -->
+                <div class="resource-card">
+                    <img src="/static/images/mh1.png" alt="Mental Health PDF">
+                    <div class="resource-info">
+                        <h6>Investing in Mental Health</h6>
+                        <a href="https://iris.who.int/bitstream/handle/10665/42823/9241562579.pdf" target="_blank">Download
+                            PDF</a>
+                    </div>
+                </div>
+
+                <div class="resource-card">
+                    <img src="/static/images/mh2.png" alt="HSE Report">
+                    <div class="resource-info">
+                        <h6>A Vision for Change – HSE</h6>
+                        <a href="https://www.hse.ie/eng/services/publications/mentalhealth/mental-health---a-vision-for-change.pdf"
+                           target="_blank">Download PDF</a>
+                    </div>
+                </div>
+
+                <div class="resource-card">
+                    <img src="/static/images/mh3.png" alt="Tips Icon">
+                    <div class="resource-info">
+                        <h6>Mental Health & Study Tips</h6>
+                        <a href="https://www.mentalhealth.org.uk/sites/default/files/2022-07/mhf-our-best-ever-mental-health-tips-backed-by-research_0.pdf"
+                           target="_blank">Download PDF</a>
+                    </div>
+                </div>
+
+                <div class="resource-card">
+                    <img src="/static/images/mh4.png" alt="Self-care PDF">
+                    <div class="resource-info">
+                        <h6>Self-Care in Adult Education</h6>
+                        <a href="https://www.etbi.ie/wp-content/uploads/2022/08/NCGE-FET-AEGS-Self-Care-Mental-Health-PDF-EN.pdf?x53681"
+                           target="_blank">Download PDF</a>
+                    </div>
+                </div>
+
+                <div class="resource-card">
+                    <img src="/static/images/mh5.jpg" alt="Journal Icon">
+                    <div class="resource-info">
+                        <h6>Wellness Journal</h6>
+                        <a href="https://nolimitshelp.org.uk/wp-content/uploads/2021/02/No-Limits-Wellness-Journal-Digital-Copy.pdf"
+                           target="_blank">Download PDF</a>
+                    </div>
+                </div>
+
+                <div class="resource-card">
+                    <img src="/static/images/mh6.png" alt="Wellness Icon">
+                    <div class="resource-info">
+                        <h6>My Wellness Journal</h6>
+                        <a href="https://www.iowyouthtrust.co.uk/wp-content/uploads/2022/09/MY-WELLNESS-JOURNAL.pdf"
+                           target="_blank">Download PDF</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <br>
+
+    <!-- Decorative image -->
+    <img src="/static/images/img1.jpg" alt="Mental Health Image" class="img-fluid rounded shadow-sm"
+         style="max-width: 50%;">
+</section>
+
+<!-- Include shared Footer from Jinja template -->
+{% include "footer.html" %}
+</body>
+</html>

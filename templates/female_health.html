@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Meta Tags: Setup character encoding and responsive behavior -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Page Title -->
+    <title>Female Health - Female Health Chatbot</title>
+
+    <!-- Bootstrap CSS (for styling and responsive layout) -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+
+    <!-- Bootstrap Icons (for UI icons like arrows, alerts, etc.) -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css">
+
+    <!-- Custom Site Styles -->
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+<!-- Include shared Navbar (Jinja template) -->
+{% include 'navbar.html' %}
+
+<!-- ===== FEMALE HEALTH PAGE MAIN SECTION ===== -->
+<section class="container py-5 female-health-sections">
+    <!-- Page Heading -->
+    <h2 class="text-center fw-bold mb-4">Female Health Topics</h2>
+
+    <!-- ===== Scroll Buttons to Jump to Topic Sections ===== -->
+    <div class="scroll-buttons text-center mb-4">
+        <!-- Buttons scroll to IDs of corresponding health sections -->
+        <button class="scroll-btn" data-target="general">General</button>
+        <button class="scroll-btn" data-target="periods">Periods</button>
+        <button class="scroll-btn" data-target="pregnancy">Pregnancy</button>
+        <button class="scroll-btn" data-target="reproductive">Reproductive</button>
+        <button class="scroll-btn" data-target="menopause">Menopause</button>
+        <button class="scroll-btn" data-target="hygiene">Hygiene</button>
+    </div>
+
+    <!-- ===== GENERAL FEMALE HEALTH SECTION ===== -->
+    <div class="topic-card text-start" id="general">
+        <!-- Covers overall health including mental, nutritional, physical, and preventive care -->
+        <h4>General Female Health</h4>
+        <p>
+            Maintaining overall health is essential at every stage of a woman’s life — from adolescence through
+            menopause and beyond.
+            Female health goes beyond just reproductive care and includes physical, mental, emotional, and social
+            wellbeing.
+        </p>
+
+        <p><strong>Mental Health:</strong> Women are more prone to anxiety and depression. Stress management, sleep,
+            and emotional support are key.
+            <a href="https://www.who.int/news-room/fact-sheets/detail/mental-health-strengthening-our-response"
+               target="_blank" rel="noopener">[WHO Mental Health]</a>
+        </p>
+
+        <p><strong>Nutrition:</strong> Iron, calcium, and folate are crucial for bone health and hormonal balance.
+            <a href="https://www.cdc.gov/nutrition/index.html" target="_blank" rel="noopener">[CDC Nutrition]</a>
+        </p>
+
+        <p><strong>Physical Activity:</strong> At least 150 minutes of moderate activity weekly is recommended.
+            <a href="https://www.cdc.gov/physicalactivity/basics/index.htm" target="_blank" rel="noopener">[CDC Physical
+                Activity]</a>
+        </p>
+
+        <p><strong>Preventive Care:</strong> Routine checkups, cervical screening (Pap smears), and breast exams help
+            catch problems early.
+            <a href="https://www.nhs.uk/conditions/cervical-screening/" target="_blank" rel="noopener">[NHS
+                Screening]</a>
+        </p>
+
+        <p><strong>Hydration & Sleep:</strong> Stay hydrated and sleep 7–9 hours per night for optimal brain and
+            hormone function.
+            <a href="https://www.sleepfoundation.org/how-sleep-works/how-much-sleep-do-we-really-need" target="_blank"
+               rel="noopener">[Sleep Foundation]</a>
+        </p>
+
+        <p><strong>Healthy Habits:</strong> Avoid tobacco, limit alcohol, and maintain a healthy weight to reduce the risk
+            of cancer and chronic illness.
+            <a href="https://www.cdc.gov/women/index.htm" target="_blank" rel="noopener">[CDC Women's Health]</a>
+        </p>
+
+        <p class="mt-3"><em>“There is no health without mental health.” — WHO</em></p>
+
+        <p class="small text-muted mt-3">Sources: WHO, CDC, NHS UK, Sleep Foundation, Mayo Clinic</p>
+    </div>
+
+    <!-- ===== MENSTRUAL HEALTH SECTION ===== -->
+    <div class="topic-card text-start" id="periods">
+        <!-- Info on menstrual cycles, PMS, hygiene, tracking, and when to seek medical help -->
+        <h4>Periods & Menstrual Health</h4>
+
+        <p>
+            Menstrual health is a key part of overall wellbeing and reproductive health. Understanding how the menstrual
+            cycle works can help reduce anxiety and detect irregularities early.
+        </p>
+
+        <p><strong>Menstrual Cycle Basics:</strong> The average cycle lasts 21–35 days. Tracking your period helps
+            monitor hormonal patterns, fertility, and overall health.
+            <a href="https://www.nhs.uk/conditions/periods/" target="_blank" rel="noopener">[NHS Period Overview]</a>
+        </p>
+
+        <p><strong>PMS & Cramps:</strong> Mild to moderate discomfort is common, but persistent or severe pain may
+            indicate conditions like endometriosis or Polycystic ovary syndrome (PCOS). Use heat, exercise, and rest —
+            and consult a doctor when
+            needed.
+            <a href="https://www.mayoclinic.org/diseases-conditions/premenstrual-syndrome/symptoms-causes/syc-20376780"
+               target="_blank" rel="noopener">[Mayo Clinic PMS]</a>
+        </p>
+
+        <p><strong>Period Hygiene:</strong> Change pads/tampons every 4–6 hours to prevent infection. Avoid fragrance
+            products and wash with mild, unscented soap.
+            <a href="https://www.cdc.gov/hygiene/about/menstrual-hygiene.html" target="_blank" rel="noopener">[CDC
+                Menstrual Hygiene]</a>
+        </p>
+
+        <p><strong>Tracking Tools:</strong> Apps like Clue or Flo can help identify cycles, ovulation, and symptoms.
+            This data is helpful for doctors and self-awareness.
+        </p>
+
+        <p><strong>When to Seek Help:</strong> Extremely heavy bleeding, irregular periods, or intense pain should
+            not be ignored. Always consult a healthcare professional.
+            <a href="https://my.clevelandclinic.org/health/diseases/14633-abnormal-menstruation-periods" target="_blank"
+               rel="noopener">[Cleveland Clinic
+                Irregular Periods]</a>
+        </p>
+
+        <p class="small text-muted mt-3">Sources: NHS UK, Mayo Clinic, CDC, Cleveland Clinic</p>
+    </div>
+
+    <!-- ===== PREGNANCY & FERTILITY SECTION ===== -->
+    <div class="topic-card text-start" id="pregnancy">
+        <!-- Covers fertility, prenatal care, emotional wellness, and warning signs -->
+        <h4>Pregnancy & Fertility</h4>
+
+        <p>
+            Pregnancy is a unique journey that requires physical, emotional, and informational support. Whether planning
+            to conceive or already expecting, understanding your body’s signals is key to a healthy experience.
+        </p>
+
+        <p><strong>Fertility Awareness:</strong> Ovulation tracking, cycle awareness, and hormonal health play a
+            central role in conception. Maintaining a healthy weight, reducing stress, and managing thyroid levels can
+            support fertility.
+            <a href="https://www.nhs.uk/conditions/infertility/" target="_blank" rel="noopener">[NHS Fertility
+                Advice]</a>
+        </p>
+
+        <p><strong>Prenatal Care:</strong> As soon as pregnancy is confirmed, schedule regular checkups. Folic acid,
+            iron, and multivitamins are crucial for early fetal development.
+            <a href="https://www.cdc.gov/ncbddd/folicacid/index.html" target="_blank" rel="noopener">[CDC: Folic
+                Acid]</a>
+        </p>
+
+        <p><strong>Healthy Pregnancy Habits:</strong> Eat a balanced diet, stay hydrated, and avoid smoking, alcohol,
+            or raw seafood. Moderate exercise like walking or yoga is beneficial.
+            <a href="https://www.columbiadoctors.org/health-library/article/quick-tips-healthy-pregnancy-habits/"
+               target="_blank"
+               rel="noopener">[Columbia Doctors: Quick Tips: Healthy Pregnancy Habits]</a>
+        </p>
+
+        <p><strong>Warning Signs During Pregnancy:</strong> If you notice bleeding, severe abdominal pain, dizziness, or
+            sudden
+            swelling, seek medical care immediately.
+            <a href="https://www.pregnancybirthbaby.org.au/warning-signs-during-pregnancy"
+               target="_blank" rel="noopener">[Pregnancy Birth Baby]</a>
+        </p>
+
+        <p><strong>Warning Signs of Infertility:</strong> If you notice change in you menstrual cycle, body weight gain,
+            hot flashes, seek a Gynecologist to help you go back to normal.
+            <a href="https://tfp-fertility.com/en-gb/blog/what-are-the-warning-signs-of-infertility"
+               target="_blank" rel="noopener">[TFP Fertility UK]</a>
+        </p>
+
+        <p><strong>Emotional Wellbeing:</strong> Hormonal shifts can impact mood. Support from partners, friends, or
+            mental health counselors is just as important as physical care.
+            <a href="https://www.nih.gov/health-information/emotional-wellness-toolkit" target="_blank"
+               rel="noopener">[NIH: Emotional Wellness Toolkit]</a>
+        </p>
+
+        <p class="small text-muted mt-3">Sources: NHS, Columbia Doctors, Mayo Clinic, CDC, Pregnancy Birth Baby,
+            TFP Fertility UK</p>
+    </div>
+
+    <!-- ===== REPRODUCTIVE CONDITIONS SECTION ===== -->
+    <div class="topic-card text-start" id="reproductive">
+        <!-- Includes PCOS, endometriosis, UTIs, and the importance of routine exams -->
+        <h4>Reproductive Health & Conditions</h4>
+
+        <p>
+            Female reproductive health includes understanding the organs, hormones, and potential conditions that affect
+            fertility, menstruation, and daily comfort. Early awareness and preventive care make a huge difference.
+        </p>
+
+        <p><strong>PCOS (Polycystic Ovary Syndrome):</strong> A hormonal imbalance causing irregular periods, acne,
+            and weight changes. It’s treatable with diet, medication, and hormone therapy.
+            <a href="https://www2.hse.ie/conditions/polycystic-ovary-syndrome/" target="_blank"
+               rel="noopener">[HSE: PCOS Overview]</a>
+        </p>
+
+        <p><strong>Endometriosis:</strong> When uterine tissue grows outside the uterus, it causes severe cramps and
+            heavy bleeding. Treatments include pain management, hormones, and sometimes surgery.
+            <a href="https://www.nhs.uk/conditions/endometriosis/" target="_blank" rel="noopener">[NHS:
+                Endometriosis]</a>
+        </p>
+
+        <p><strong>UTIs (Urinary Tract Infections):</strong> Burning while urinating, frequent urges, and pelvic pain
+            are signs. Stay hydrated and seek antibiotics when needed.
+            <a href="https://www.mayoclinic.org/diseases-conditions/urinary-tract-infection/symptoms-causes/syc-20353447"
+               target="_blank" rel="noopener">[Mayo Clinic: UTIs]</a>
+        </p>
+
+        <p><strong>Routine Exams:</strong> Pap smears, pelvic exams, and STI testing help detect issues early and
+            protect your reproductive health.
+            <a href="https://mcpress.mayoclinic.org/women-health/routine-screening-tests-for-women-as-they-enter-midlife-and-beyond-2/"
+               target="_blank" rel="noopener">[Mayo Clinic: Routine screening tests for women as they enter midlife and
+                beyond]</a>
+        </p>
+
+        <p class="small text-muted mt-3">Sources: NHS, HSE, Mayo Clinic</p>
+    </div>
+
+    <!-- ===== MENOPAUSE SECTION ===== -->
+    <div class="topic-card text-start" id="menopause">
+        <!-- Addresses symptoms, coping tips, HRT, and when to consult a doctor -->
+        <h4>Menopause & Hormonal Changes</h4>
+
+        <p>
+            Menopause is a natural transition that typically occurs between ages 45–55. Hormonal shifts can affect your
+            mood, body, and mind — but they can be managed with the right knowledge and support.
+        </p>
+
+        <p><strong>What is Menopause?</strong> Defined as 12 months without a period. Symptoms like hot flashes,
+            restlessness, and mood swings may begin in perimenopause (the transition phase).
+            <a href="https://www.nhs.uk/conditions/menopause/" target="_blank" rel="noopener">[NHS: Menopause]</a>
+        </p>
+
+        <p><strong>Coping with Symptoms:</strong> Exercise, cool sleeping environments, and deep breathing can
+            help. Some women benefit from hormone replacement therapy (HRT).
+            <a href="https://www.mayoclinic.org/diseases-conditions/menopause/symptoms-causes/syc-20353397"
+               target="_blank" rel="noopener">[Mayo Clinic: Menopause]</a>
+        </p>
+
+        <p><strong>When to Seek Help:</strong> Irregular bleeding, mood changes, or intense physical symptoms should
+            be discussed with your doctor.
+            <a href="https://www.womenshealth.gov/menopause" target="_blank" rel="noopener">[Women'sHealth.gov]</a>
+        </p>
+        <p><strong>Menopause Treatment:</strong> Every woman goes through menopause and not all may need treatment
+            while women need treatment.
+            <a href="https://www2.hse.ie/conditions/menopause/menopause-treatment/" target="_blank"
+               rel="noopener">[HSE]</a>
+        </p>
+
+        <p class="small text-muted mt-3">Sources: NHS, Mayo Clinic, Women's Health.gov, HSE</p>
+    </div>
+
+    <!-- ===== PERSONAL HYGIENE SECTION ===== -->
+    <div class="topic-card text-start" id="hygiene">
+        <!-- Hygiene tips tailored for teens, adults, and older women across life stages -->
+        <h4>Hygiene for All Ages</h4>
+
+        <p>
+            Personal hygiene is important throughout every stage of life — not just for cleanliness, but for confidence
+            and health. From puberty to post-menopause, hygiene needs to evolve.
+        </p>
+
+        <p><strong>Puberty & Teens:</strong> Begin using gentle cleansers, wear breathable underwear, and change pads
+            regularly during periods.
+            <a href="https://kidshealth.org/en/teens/hygiene-basics.html" target="_blank" rel="noopener">[Teens Health:
+                Hygiene Basics]</a>
+        </p>
+
+        <p><strong>Adults:</strong> Wipe front to back, avoid douching, wear cotton underwear, and stay hydrated.
+            Track cycle changes and monitor for infections.
+            <a href="https://www.phdfemininehealth.com/blogs/articles/feminine-hygiene" target="_blank"
+               rel="noopener">[PHD Feminine Health: The Ultimate Guide to Feminine Hygiene</a>
+        </p>
+
+        <p><strong>Older Women:</strong> Postmenopause may bring dryness — use doctor-recommended moisturizers, and
+            stay consistent with basic hygiene and checkups.
+            <a href="https://www.elder.org/live-in-care/care-for-the-elderly-grooming-and-hygiene-guide/"
+               target="_blank" rel="noopener">[Elder: Care for the elderly]</a>
+        </p>
+
+        <p><strong>Product Safety:</strong> Avoid fragrance soaps, talcum powder, and tight clothes that trap
+            moisture. Stick to pH-balanced washes and water when in doubt.
+            <a href="https://www.brookings.edu/articles/period-products-health-risks-and-regulations/"
+               target="_blank" rel="noopener">[Brookings: Period products, health risks, and regulations]</a>
+        </p>
+
+        <p class="small text-muted mt-3">Sources: Brookings, Teens Health, PHD Feminine Health</p>
+    </div>
+</section>
+
+<!-- Include shared Footer from Jinja template -->
+{% include "footer.html" %}
+</body>
+</html>

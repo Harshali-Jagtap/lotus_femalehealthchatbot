@@ -1,26 +1,34 @@
+# ========== IMPORTS ==========
+# Models, routing, user session handling, database
+import re, random, json
+from threading import Thread
 from flask import Blueprint, request, jsonify, render_template, session, redirect, url_for
 from security.db import db_instance
 from models.biobert import BioBERT
 from models.clinicalbert import ClinicalBERT
 from models.drugbank import DrugBank
 from models.medquad import MedQuAD
-from routes.auth import  users_collection
+from routes.auth import users_collection
 from models.t5_summarizer import T5Simplifier
 from models.openAI import OpenAIAssistant
+from models.bart_classifier import BARTClassifier
 
-# Load AI models
+# ========== LOAD ALL MODELS ==========
+# NLP pipelines: DrugBank, MedQuAD, ClinicalBERT, BioBERT, BART, OpenAI, etc.
 t5_simplifier = T5Simplifier()
 medquad = MedQuAD()
 biobert = BioBERT()
 clinicalbert = ClinicalBERT()
 drugbank = DrugBank(simplifier=t5_simplifier)
+bart_classifier = BARTClassifier()
+openai_assistant = OpenAIAssistant()
 
+# ========== BLUEPRINT & DB ==========
 chatbot_bp = Blueprint("chatbot", __name__, template_folder="templates")
-
-# Save chat history in MongoDB
 chat_collection = db_instance.get_collection("chat_history")
 
 
+# ========== CHATBOT PAGE ROUTE: /chatbot ==========
 @chatbot_bp.route("/chatbot")
 def chatbot():
     """Renders the chatbot interface with user details."""
@@ -32,7 +40,34 @@ def chatbot():
     return render_template("chatbot.html", user=user)
 
 
-# In chatbot.py, update process_user_query():
+# ========== CHAT HISTORY ==========
+def save_chat_history(user_email, user_message, bot_response):
+    """Stores user chat history in MongoDB."""
+    try:
+        # Find the user in chat history collection
+        user_chat = chat_collection.find_one({"email": user_email})
+
+        # Structure for new chat entry
+        new_chat = {"user_message": user_message, "bot_response": bot_response}
+
+        if user_chat:
+            # If user exists, append new chat to the chat array
+            chat_collection.update_one(
+                {"email": user_email},
+                {"$push": {"chat_history": new_chat}}
+            )
+        else:
+            # If new user, create a new document
+            chat_collection.insert_one({
+                "email": user_email,
+                "chat_history": [new_chat]
+            })
+    except Exception as e:
+        print(f"Error saving chat history: {str(e)}")
+
+
+# ========== TEXT PROCESSING HELPERS ==========
+# Process user a query to required question
 def process_user_query(user_input):
     # 1. DrugBank (exact match)
     drug_info = drugbank.get_drug_details(user_input)
@@ -56,189 +91,177 @@ def process_user_query(user_input):
     return simplified
 
 
-def save_chat_history(user_email, user_message, bot_response):
-    """Stores user chat history in MongoDB."""
-    try:
-        # Find the user in chat history collection
-        user_chat = chat_collection.find_one({"email": user_email})
+def format_empathetic_response(raw):
+    if not raw or len(raw.strip()) < 10:
+        return raw  # Skip formatting if fallback or empty
 
-        # Structure for new chat entry
-        new_chat = {"user_message": user_message, "bot_response": bot_response}
+    intro_phrases = [
+        "Here's what I found for you:",
+        "You're not alone — this is quite common.",
+        "Let me help explain this for you:",
+        "This might help you understand things better:",
+        "Take a moment — here's a simplified explanation:"
+    ]
 
-        if user_chat:
-            # If user exists, append new chat to the chat array
-            chat_collection.update_one(
-                {"email": user_email},
-                {"$push": {"chat_history": new_chat}}
-            )
-        else:
-            # If new user, create a new document
-            chat_collection.insert_one({
-                "email": user_email,
-                "chat_history": [new_chat]
-            })
-    except Exception as e:
-        print(f"❌ Error saving chat history: {str(e)}")
+    closing_phrases = [
+        "Would you like to know more about symptoms, treatment, or causes?",
+        "Feel free to ask if you want a simpler version.",
+        "Let me know if you'd like related advice.",
+        "I'm here to support you — just ask anything else.",
+        "You're doing great. Ask anything you're unsure about."
+    ]
 
+    import random
+    intro = random.choice(intro_phrases)
+    closing = random.choice(closing_phrases)
 
-# @chatbot_bp.route("/chat", methods=["POST"])
-# def chat():
-#     user_message = request.json.get("message", "").lower().strip()
-#     raw_response = None
-#
-#     # Step 1: Check if the query is MEDICAL
-#     is_medical = any(keyword in user_message for keyword in
-#                      ["symptom", "pain", "drug", "fever", "hypertension", "dose"])
-#
-#     if is_medical:
-#         # Existing priorities 1-4
-#         medquad_response = medquad.search_medquad(user_message)
-#         if medquad_response:
-#             raw_response = medquad_response
-#
-#         if not raw_response:
-#             drug_response = drugbank.get_drug_details(user_message)
-#             if drug_response and "No data" not in drug_response:
-#                 raw_response = drug_response
-#
-#         if not raw_response and any(keyword in user_message for keyword in ["symptom", "pain", "ache"]):
-#             raw_response = clinicalbert.analyze_symptoms(user_message)
-#
-#         if not raw_response:
-#             raw_response = biobert.answer_question(user_message)
-#
-#     # New: Fallback to OpenAI if no valid response
-#     else:
-#         try:
-#             openai_assistant = OpenAIAssistant()
-#             raw_response = openai_assistant.get_safe_response(user_message)
-#         except Exception as e:
-#             raw_response = "I couldn't find an answer. Please try another question."
-#
-#         # Simplify only medical responses
-#     if is_medical and raw_response:
-#         simplified = t5_simplifier.simplify(raw_response)
-#     else:
-#         simplified = raw_response  # Return OpenAI's already-simple response
-#
-#     return jsonify({"response": simplified})
+    return f"{intro}\n\n{raw.strip()}\n\n{closing}"
 
 
-# @chatbot_bp.route("/chat", methods=["POST"])
-# def chat():
-#     user_message = request.json.get("message", "").lower().strip()
-#     raw_response = None
-#     print(f"\n🔍 User Query: '{user_message}'")
-#
-#     # Step 1: Check if the query is MEDICAL
-#     is_medical = any(keyword in user_message for keyword in
-#                      ["symptom", "pain", "drug", "fever", "hypertension", "dose"])
-#     print(f"🏥 Medical Query? {'✅' if is_medical else '❌'}")
-#
-#     if is_medical:
-#         print("\n🩺 Starting Medical Pipeline:")
-#         # Priority 1: MedQuAD
-#         medquad_response = medquad.search_medquad(user_message)
-#         if medquad_response:
-#             print(f"1️⃣ MedQuAD Answer: {medquad_response[:100]}...")
-#             raw_response = medquad_response
-#         else:
-#             print("1️⃣ MedQuAD: ❌ No match")
-#
-#         # Priority 2: DrugBank
-#         if not raw_response:
-#             drug_response = drugbank.get_drug_details(user_message)
-#             if drug_response and "No data" not in drug_response:
-#                 print(f"2️⃣ DrugBank Answer: {drug_response[:100]}...")
-#                 raw_response = drug_response
-#             else:
-#                 print("2️⃣ DrugBank: ❌ No match")
-#
-#         # Priority 3: ClinicalBERT
-#         if not raw_response and any(keyword in user_message for keyword in ["symptom", "pain", "ache"]):
-#             print("3️⃣ Trying ClinicalBERT...")
-#             raw_response = clinicalbert.analyze_symptoms(user_message)
-#             print(f"ClinicalBERT Answer: {raw_response[:100]}..." if raw_response else "3️⃣ ClinicalBERT: ❌ No match")
-#
-#         # Priority 4: BioBERT
-#         if not raw_response:
-#             print("4️⃣ Trying BioBERT...")
-#             raw_response = biobert.answer_question(user_message)
-#             print(f"BioBERT Answer: {raw_response[:100]}..." if raw_response else "4️⃣ BioBERT: ❌ No match")
-#
-#     # Non-medical path
-#     else:
-#         print("\n🌐 Non-Medical Query Path:")
-#         try:
-#             print("🤖 Asking OpenAI...")
-#             openai_assistant = OpenAIAssistant()
-#             raw_response = openai_assistant.get_safe_response(user_message)
-#             print(f"OpenAI Response: {raw_response[:100]}...")
-#         except Exception as e:
-#             print(f"❌ OpenAI Error: {e}")
-#             raw_response = "I couldn't find an answer. Please try another question."
-#
-#     # Response processing
-#     print("\n🔧 Processing Response:")
-#     if raw_response:
-#         if is_medical:
-#             print("⚕️ Simplifying medical response...")
-#             simplified = t5_simplifier.simplify(raw_response)
-#         else:
-#             simplified = raw_response
-#         print(f"📤 Final Response: {simplified[:120]}...")
-#     else:
-#         simplified = "I couldn't find an answer. Please try another question."
-#         print("📤 No valid responses found")
-#
-#     return jsonify({"response": simplified})
+def extract_drug_name(text):
+    patterns = [
+        r"what is (.+)",
+        r"tell me about (.+)",
+        r"purpose of (.+)",
+        r"use of (.+)",
+        r"side effects of (.+)",
+        r"dosage for (.+)",
+        r"(.*)"
+    ]
+    for pattern in patterns:
+        match = re.search(pattern, text, re.IGNORECASE)
+        if match:
+            return match.group(1).strip()
+    return text.split()[-1]  # Fallback
 
 
+def needs_simplification(text):
+    if not text or len(text.split()) < 40:
+        return False
+    medical_terms = ["contraindication", "metabolized", "pharmacokinetics", "therapeutic", "diagnostic"]
+    return any(term in text.lower() for term in medical_terms)
+
+
+def load_mental_health_data():
+    with open("data/mental_health.json", "r", encoding="utf-8") as file:
+        return json.load(file)
+
+
+mental_health_data = load_mental_health_data()
+
+
+def check_mental_health_query(user_message):
+    user_message = user_message.lower()
+    for entry in mental_health_data:
+        if any(keyword in user_message for keyword in entry["keywords"]):
+            print(f"Detected mental health category: {entry['category']}")
+            return entry["response"]
+    return None
+
+
+def load_prompt_responses():
+    with open("data/prompt_responses.json", "r", encoding="utf-8") as f:
+        return json.load(f)
+
+
+prompt_responses = load_prompt_responses()
+
+
+def check_static_prompts(user_message):
+    user_message = user_message.lower().strip()
+    for item in prompt_responses:
+        if user_message == item["prompt"]:
+            return item["response"]
+    return None
+
+
+# ========== ACTIVE CHAT ROUTE (CURRENT) ==========
 @chatbot_bp.route("/chat", methods=["POST"])
 def chat():
-    user_message = request.json.get("message", "").lower().strip()
-    raw_response = None
-    is_medical = False  # Reset logic
+    """
+    Processes user messages and routes them through the appropriate pipeline:
+    DrugBank → MedQuAD → Mental Health → ClinicalBERT → BioBERT → OpenAI
+    """
+    user_message = request.json.get("message", "").strip()
+    user_email = session.get("email")
+    is_prompt = request.json.get("is_prompt", False)
+    response = None
 
-    # --- Priority 1: MedQuAD ---
-    medquad_response = medquad.search_medquad(user_message)
-    if medquad_response:
-        print(f"1️⃣ MedQuAD Answer: {medquad_response[:100]}...")
-        raw_response = medquad_response
-        is_medical = True
+    # Step 1: Handle static button prompts if flagged
+    try:
+        print(f"Query: {user_message}")
 
-    # --- Priority 2: DrugBank ---
-    if not raw_response:
-        drug_response = drugbank.get_drug_details(user_message)
-        if drug_response and "No data" not in drug_response:
-            print(f"2️⃣ DrugBank Answer: {drug_response[:100]}...")
-            raw_response = drug_response
-            is_medical = True
+        # Handle static prompt buttons
+        if is_prompt:
+            static_response = check_static_prompts(user_message)
+            if static_response:
+                Thread(target=save_chat_history, args=(user_email, user_message, static_response)).start()
+                return jsonify({"response": static_response})
 
-    # --- Priority 3: ClinicalBERT/BioBERT ---
-    if not raw_response:
-        # Auto-detect symptom/disease queries
-        if any(keyword in user_message for keyword in ["symptom", "pain", "ache", "fever", "cough"]):
-            print("3️⃣ Trying ClinicalBERT...")
-            raw_response = clinicalbert.analyze_symptoms(user_message)
-            is_medical = True
+        # Step 2: DrugBank: detect meds like 'paracetamol', 'ibuprofen'
+        drug_name = extract_drug_name(user_message)
+        response = drugbank.get_drug_details(drug_name)
+        if response:
+            print("DrugBank match")
+            Thread(target=save_chat_history, args=(user_email, user_message, response)).start()
+            return jsonify({"response": response})
+
+        # Step 3: MedQuAD: use semantic Q&A search
+        response = medquad.search_medquad(user_message)
+        if response:
+            print("MedQuAD match")
+            Thread(target=save_chat_history, args=(user_email, user_message, response)).start()
+            return jsonify({"response": response})
+
+        # Step 4: Mental Health: check keywords against a structured guide
+        response = check_mental_health_query(user_message)
+        if response:
+            Thread(target=save_chat_history, args=(user_email, user_message, response)).start()
+            return jsonify({"response": response})
+
+        # Step 5: ClinicalBERT: use for symptom-based questions
+        vague_prompts = ["symptoms", "advice", "tips", "help", "general", "what to do"]
+        symptom_keywords = ["pain", "symptom", "ache", "fever", "cough", "vomiting", "headache", "dizzy", "tired"]
+
+        if any(kw in user_message.lower() for kw in symptom_keywords) and len(user_message.split()) > 4 and not any(
+                v in user_message.lower() for v in vague_prompts):
+            print("🩺 Using ClinicalBERT")
+            response = clinicalbert.analyze_symptoms(user_message)
+            if response and len(response.strip()) >= 15:
+                Thread(target=save_chat_history, args=(user_email, user_message, response)).start()
+                return jsonify({"response": response})
+            else:
+                print("ClinicalBERT gave weak output.")
+                response = None
+
+        # Step 6: BioBERT: fallback for broader general health queries
+        female_keywords = [
+            "period", "menstruation", "menstrual", "ovulation", "pregnancy",
+            "fertility", "uterus", "pcos", "birth control", "get periods"
+        ]
+        if not any(w in user_message.lower() for w in female_keywords) and len(user_message.split()) > 4 and not any(
+                v in user_message.lower() for v in vague_prompts):
+            print("Using BioBERT")
+            response = biobert.answer_question(user_message)
+            if response and len(response.strip()) > 15:
+                Thread(target=save_chat_history, args=(user_email, user_message, response)).start()
+                return jsonify({"response": response})
         else:
-            print("4️⃣ Trying BioBERT...")
-            raw_response = biobert.answer_question(user_message)
-            is_medical = True if raw_response else False
+            print("Skipping BioBERT")
 
-    # --- Fallback to OpenAI ---
-    if not raw_response:
-        print("🌐 No medical answers. Using OpenAI...")
-        try:
-            raw_response = OpenAIAssistant().get_safe_response(user_message)
-        except:
-            raw_response = "I couldn't find an answer. Please try another question."
+        # Step 7: OpenAI: final fallback and empathetic formatting
+        print("Using OpenAI")
+        response = openai_assistant.get_safe_response(user_message)
 
-    # --- Simplify ONLY if response is medical and complex ---
-    if is_medical and ("Purpose:" not in raw_response):  # Skip simplification for DrugBank
-        simplified = t5_simplifier.simplify(raw_response)
-    else:
-        simplified = raw_response
+        if not response or len(response.strip()) < 10:
+            response = "I'm sorry, I couldn't find a clear answer. Try rephrasing your question."
 
-    return jsonify({"response": simplified})
+        response = format_empathetic_response(response)
+        Thread(target=save_chat_history, args=(user_email, user_message, response)).start()
+        return jsonify({"response": response})
+
+    except Exception as e:
+        print(f"Error: {str(e)}")
+        return jsonify({
+            "response": "Sorry, something went wrong. Please try again later."
+        })

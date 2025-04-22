@@ -1,25 +1,29 @@
-import os
-import jwt
-import bcrypt
+# ===== Imports =====
 from flask import Blueprint, flash, request, render_template, session, jsonify, redirect, url_for
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 from datetime import datetime, timedelta, timezone
 from jwt import ExpiredSignatureError, InvalidTokenError
+import bcrypt
+import jwt
+import os
+from bson import ObjectId  # Import ObjectId
+from security.db import db_instance  # Reusable DB connection
 
-from security.db import db_instance
-
-# Flask session secret key
+# ===== FLASK Config =====
 SECRET_KEY = os.getenv("SECRET_KEY", "your_secret_key")
 auth_bp = Blueprint("auth", __name__, template_folder="templates")
 
-# Get the "users" collection
+# MongoDB Collection: Users
 users_collection = db_instance.get_collection("users")
 
-# Rate Limiting (to prevent brute force attacks)
+# Rate limiter for security (e.g., prevent brute-force)
 limiter = Limiter(get_remote_address)
 
-# **Function to check if account is locked**
+
+# ===== Helper Functions =====
+
+# Check if user account is temporarily locked
 def is_account_locked(email):
     user = users_collection.find_one({"email": email})
     if user and "failed_attempts" in user:
@@ -28,12 +32,12 @@ def is_account_locked(email):
     return False
 
 
-# **Function to reset failed attempts**
+# Reset login attempts
 def reset_failed_attempts(email):
     users_collection.update_one({"email": email}, {"$set": {"failed_attempts": 0, "lock_until": None}})
 
 
-# **Function to increase failed attempts**
+# Increase failed login attempts and possibly lock account
 def increase_failed_attempts(email):
     user = users_collection.find_one({"email": email})
     if user:
@@ -44,24 +48,25 @@ def increase_failed_attempts(email):
                                     {"$set": {"failed_attempts": failed_attempts, "lock_until": lock_until}})
 
 
-from bson import ObjectId  # ✅ Import ObjectId
+# ===== Routes =====
 
+# Route: Chatbot access (requires login)
 @auth_bp.route("/chatbot")
 def chatbot():
-    """Render chatbot page only if user is logged in."""
+    """Render chatbot page only if a user is logged in."""
     if "user_id" not in session:
         return render_template("login.html")
 
-    user = users_collection.find_one({"_id": ObjectId(session["user_id"])})  # ✅ Convert session ID to ObjectId
+    user = users_collection.find_one({"_id": ObjectId(session["user_id"])})  # Convert session ID to ObjectId
 
     if not user:
         return render_template("login.html")
 
-    print("✅ SESSION AT CHATBOT:", session)  # ✅ Debugging print
+    print("SESSION AT CHATBOT:", session)  # Debugging print
     return render_template("chatbot.html", user=user)
 
 
-# **Register Route (Redirects to log in.html after success)**
+# Route: Register a new user
 @auth_bp.route("/register", methods=["POST"])
 def register():
     """Handles user registration."""
@@ -77,7 +82,7 @@ def register():
     password = data.get("password")
 
     if users_collection.find_one({"email": email}):
-        flash("Email already exists. Try logging in.", "danger")  # ✅ Show error message
+        flash("Email already exists. Try logging in.", "danger")  # Show an error message
         return redirect("login.html")
 
     hashed_password = bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt()).decode("utf-8")
@@ -93,11 +98,11 @@ def register():
         "created_at": datetime.utcnow()
     })
 
-    flash("Registration successful! Please login.", "success")  # ✅ Flash success message
+    flash("Registration successful! Please login.", "success")  # Flash success message
     return redirect("login.html")
 
 
-# ✅ **Login Route (Handles Content-Type Errors)**
+# Route: Login with email and password
 @auth_bp.route("/login", methods=["POST"])
 def login():
     """Handles user login and stores session."""
@@ -122,14 +127,15 @@ def login():
 
     return redirect(url_for("auth.chatbot"))
 
-# **Logout Route (Redirects to home.html)**
+
+# Route: Logout and return to home pag
 @auth_bp.route("/logout", methods=["GET"])
 def logout():
     session.clear()  # Clear session data
     return render_template("index.html")
 
 
-# **Forgot Password (Sends reset token)**
+# Route: Forgot Password (generates JWT reset token)
 @auth_bp.route("/forgot-password", methods=["POST"])
 def forgot_password():
     data = request.json
@@ -150,7 +156,7 @@ def forgot_password():
                     "token": reset_token}), 200  # Fix unused variable warning
 
 
-# **Reset Password Route**
+# Route: Reset Password using JWT token
 @auth_bp.route("/reset-password", methods=["POST"])
 def reset_password():
     data = request.json
@@ -160,9 +166,9 @@ def reset_password():
     try:
         decoded_token = jwt.decode(token, SECRET_KEY, algorithms=["HS256"])
         email = decoded_token.get("email")
-    except ExpiredSignatureError:  # Fix missing import
+    except ExpiredSignatureError:
         return jsonify({"message": "Reset link expired.", "status": "error"}), 400
-    except InvalidTokenError:  # Fix missing import
+    except InvalidTokenError:
         return jsonify({"message": "Invalid reset link.", "status": "error"}), 400
 
     hashed_password = bcrypt.hashpw(new_password.encode("utf-8"), bcrypt.gensalt()).decode("utf-8")

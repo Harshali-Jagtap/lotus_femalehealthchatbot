@@ -1,0 +1,27 @@
+[
+  {
+    "category": "emergency",
+    "keywords": ["emergency", "suicide", "urgent", "help now"],
+    "response": "If you're in immediate danger or need urgent help, please contact emergency services or a 24/7 support line:\n📞 Samaritans: 116 123 (free)\n📞 Pieta House: 1800 247 247\nYou're not alone — help is always available. 💛"
+  },
+  {
+    "category": "anxiety",
+    "keywords": ["anxiety", "panic", "overwhelmed", "worried"],
+    "response": "It sounds like you're feeling anxious. Try this:\n🧘‍♀️ 4-7-8 Breathing: Inhale for 4s, hold for 7s, exhale for 8s.\n📝 Write your feelings in a journal.\n🌿 Step outside or take a walk if possible.\nWould you like more mindfulness tips or info on counselling?"
+  },
+  {
+    "category": "counselling",
+    "keywords": ["counsel", "counselling", "therapy", "talk to someone"],
+    "response": "To talk to a counselor at your university:\n💬 Visit the [Student Counselling Service](https://tus.ie/counselling/) or email studentcounselling@tus.ie\nThey offer one-on-one support, workshops, and mindfulness sessions."
+  },
+  {
+    "category": "mindfulness",
+    "keywords": ["mindfulness", "relax", "breathe", "meditation"],
+    "response": "Here’s a simple mindfulness tip:\n🌸 Close your eyes and do 5-4-3-2-1 grounding: 5 things you can see, 4 touch, 3 hear, 2 smell, 1 taste.\nIt gently centers your mind."
+  },
+  {
+    "category": "stress",
+    "keywords": ["stress", "burnout", "tired", "fatigue"],
+    "response": "Feeling stressed or burned out? Try:\n🧘 Deep breathing for 5 minutes\n📅 Short walks, tech-free time, and 7–8 hours sleep\n💬 Talk to someone — even texting a friend helps.\nWant tips for study-life balance?"
+  }
+]

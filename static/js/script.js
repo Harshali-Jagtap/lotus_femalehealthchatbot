@@ -1,29 +1,31 @@
+// ========== CHATBOT INTERACTION ==========
+// Wait until the page is fully loaded
 document.addEventListener("DOMContentLoaded", function () {
-    console.log("Chatbot script loaded successfully.");
-
     const sendButton = document.getElementById("send-btn");
     const userInput = document.getElementById("user-input");
     const chatBody = document.getElementById("chat-body");
 
-    if (!sendButton || !userInput || !chatBody) {
-        console.error("Error: Required elements missing in `chatbot.html`.");
-        return;
-    }
+    if (sendButton && userInput && chatBody) {
+        // On button click or Enter key, send a message
+        console.log("Chatbot script loaded successfully.");
 
-    sendButton.addEventListener("click", function () {
-        sendMessage();
-    });
-
-    userInput.addEventListener("keypress", function (event) {
-        if (event.key === "Enter") {
+        sendButton.addEventListener("click", function () {
             sendMessage();
-        }
-    });
+        });
+
+        userInput.addEventListener("keypress", function (event) {
+            if (event.key === "Enter") {
+                sendMessage();
+            }
+        });
+    }
 });
 
+// Send user message to server and display bot response
 async function sendMessage() {
     const userInputField = document.getElementById("user-input");
     const chatBody = document.getElementById("chat-body");
+    const typingIndicator = document.getElementById("typing-indicator");
 
     if (!userInputField || !chatBody) return;
 
@@ -32,38 +34,42 @@ async function sendMessage() {
 
     console.log("Sending message:", userMessage);
 
-    // Create User Message Bubble
+    // Show a user message
     const userMessageDiv = document.createElement("div");
     userMessageDiv.classList.add("chat-message", "user-message");
     userMessageDiv.textContent = userMessage;
     chatBody.appendChild(userMessageDiv);
 
-    // Auto-scroll to bottom
+    // Scroll down and reset input
     chatBody.scrollTop = chatBody.scrollHeight;
-
-    // Clear input field
     userInputField.value = "";
 
-    // Fetch bot response
+    // Show typing animation
+    typingIndicator.style.display = "block";
+    chatBody.scrollTop = chatBody.scrollHeight;
+
+    // Get bot response
     const botResponse = await fetchResponse(userMessage);
 
-    // Create Bot Response Bubble
+    // Hide typing
+    typingIndicator.style.display = "none";
+
+    // Show bot message
     const botMessageDiv = document.createElement("div");
     botMessageDiv.classList.add("chat-message", "bot-message");
     botMessageDiv.textContent = botResponse;
     chatBody.appendChild(botMessageDiv);
-
-    // Auto-scroll to bottom
     chatBody.scrollTop = chatBody.scrollHeight;
 }
 
+// Fetch bot reply from backend
 async function fetchResponse(userMessage) {
     try {
         console.log("Fetching response from backend...");
         const response = await fetch("/chat", {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ message: userMessage })
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify({message: userMessage})
         });
 
         const data = await response.json();
@@ -75,275 +81,7 @@ async function fetchResponse(userMessage) {
     }
 }
 
-//Dashaboard.html
-document.addEventListener("DOMContentLoaded", function () {
-    const toggleHealthTips = document.getElementById("toggleHealthTips");
-    const healthTipsContainer = document.getElementById("healthTipsContainer");
-
-    toggleHealthTips.addEventListener("click", function () {
-        fetch("/toggle_health_tips", {method: "POST"})
-            .then(response => response.json())
-            .then(data => {
-                healthTipsContainer.style.display = data.show_health_tips ? "block" : "none";
-            })
-            .catch(error => console.error("Error toggling health tips:", error));
-    });
-});
-
-// Dashboard Calendar
-document.addEventListener("DOMContentLoaded", function () {
-    let calendarEl = document.getElementById("calendar");
-
-    let eventFormContainer = document.getElementById("eventFormContainer");
-    let eventForm = document.getElementById("eventForm");
-    let cancelEventBtn = document.getElementById("cancelEventBtn");
-    let eventDateInput = document.getElementById("eventDate");
-    let eventTitleInput = document.getElementById("eventTitle");
-
-    let eventDetailsContainer = document.getElementById("eventDetailsContainer");
-    let eventTitleDisplay = document.getElementById("eventTitleDisplay");
-    let eventDateDisplay = document.getElementById("eventDateDisplay");
-    let closeDetailsBtn = document.getElementById("closeDetailsBtn");
-
-    let editEventContainer = document.getElementById("editEventContainer");
-    let editEventTitle = document.getElementById("editEventTitle");
-    let editEventBtn = document.getElementById("editEventBtn");
-    let saveEditEventBtn = document.getElementById("saveEditEventBtn");
-
-    let deleteEventContainer = document.getElementById("deleteEventContainer");
-    let deleteEventBtn = document.getElementById("deleteEventBtn");
-    let confirmDeleteEventBtn = document.getElementById("confirmDeleteEventBtn");
-    let cancelDeleteEventBtn = document.getElementById("cancelDeleteEventBtn");
-
-    let selectedEvent = null;
-
-    // Function to Hide All Forms
-    function hideAllForms() {
-        eventFormContainer.style.display = "none";
-        eventDetailsContainer.style.display = "none";
-        editEventContainer.style.display = "none";
-        deleteEventContainer.style.display = "none";
-    }
-
-    let calendar = new FullCalendar.Calendar(calendarEl, {
-        initialView: "dayGridMonth", selectable: true, editable: true, events: "/get_events",
-
-        // Open Add Event Form When Clicking a Date
-        dateClick: function (info) {
-            hideAllForms(); // Close all other forms
-            eventDateInput.value = info.dateStr;
-            eventFormContainer.style.display = "block"; // Show add event form
-            eventTitleInput.focus();
-        },
-
-        // Show Event Details When Clicking an Event
-        eventClick: function (info) {
-            hideAllForms(); // Close all other forms
-            selectedEvent = info.event;
-            eventTitleDisplay.innerText = selectedEvent.title;
-            eventDateDisplay.innerText = selectedEvent.start.toISOString().split("T")[0];
-            eventDetailsContainer.style.display = "block"; // Show event details
-        }
-    });
-
-    calendar.render();
-
-    // Handle Event Form Submission (Add Event)
-    eventForm.addEventListener("submit", function (e) {
-        e.preventDefault();
-        let title = eventTitleInput.value.trim();
-        let date = eventDateInput.value;
-
-        if (title) {
-            fetch("/add_event", {
-                method: "POST",
-                headers: {"Content-Type": "application/json"},
-                body: JSON.stringify({title: title, date: date}),
-            })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.status === "success") {
-                        calendar.addEvent({
-                            id: data.event.id, title: data.event.title, start: data.event.start
-                        });
-                        eventFormContainer.style.display = "none"; // Hide form after saving
-                        eventTitleInput.value = ""; // Clear input field
-                    } else {
-                        alert("Error adding event: " + data.message);
-                    }
-                });
-        }
-    });
-
-    // Cancel Event Form
-    cancelEventBtn.addEventListener("click", function () {
-        eventFormContainer.style.display = "none"; // Hide the form
-    });
-
-    // Close Event Details
-    closeDetailsBtn.addEventListener("click", function () {
-        eventDetailsContainer.style.display = "none";
-    });
-
-    // Show Edit Event Form
-    document.addEventListener("click", function (event) {
-        if (event.target.id === "editEventBtn") {
-            editEventContainer.style.display = "block";  // Show edit form
-            editEventTitle.value = selectedEvent.title;  // Set existing title
-        }
-    });
-
-    // Save Edited Event
-    saveEditEventBtn.addEventListener("click", function () {
-        let newTitle = editEventTitle.value.trim();
-        if (selectedEvent && newTitle) {
-            fetch("/edit_event/" + selectedEvent.id, {  // Send event ID and new title to backend
-                method: "PUT",
-                headers: {"Content-Type": "application/json"},
-                body: JSON.stringify({title: newTitle})
-            })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.status === "success") {
-                        selectedEvent.setProp("title", newTitle);  // Update calendar event title
-                        editEventContainer.style.display = "none";  // Hide edit form
-                    } else {
-                        alert("Error updating event: " + data.message);
-                    }
-                });
-        }
-    });
-
-    // Cancel Edit Event
-    cancelEditEventBtn.addEventListener("click", function () {
-        editEventContainer.style.display = "none";  // Hide edit confirmation box
-    });
-    // Show Delete Confirmation Box
-    document.addEventListener("click", function (event) {
-        if (event.target.id === "deleteEventBtn") {
-            deleteEventContainer.style.display = "block";  // Show delete confirmation box
-        }
-    });
-
-    // Confirm Delete Event
-    confirmDeleteEventBtn.addEventListener("click", function () {
-        if (selectedEvent) {
-            fetch("/delete_event/" + selectedEvent.id, {
-                method: "DELETE",
-                headers: {"Content-Type": "application/json"}
-            })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.status === "success") {
-                        selectedEvent.remove();  // Remove event from calendar
-                        deleteEventContainer.style.display = "none";  // Hide confirmation box
-                    } else {
-                        alert("Error deleting event: " + data.message);
-                    }
-                });
-        }
-    });
-
-    // Cancel Delete Event
-    cancelDeleteEventBtn.addEventListener("click", function () {
-        deleteEventContainer.style.display = "none";  // Hide delete confirmation box
-    });
-
-
-});
-
-//Index page
-document.addEventListener("DOMContentLoaded", function () {
-});
-
-//Log in Register
-document.addEventListener("DOMContentLoaded", function () {
-    // Handle Login Form
-    const loginForm = document.querySelector("form[action='/login']");
-    if (loginForm) {
-        loginForm.addEventListener("submit", async function (event) {
-            event.preventDefault();
-
-            const email = document.getElementById("email").value.trim();
-            const password = document.getElementById("password").value.trim();
-            const messageDiv = document.getElementById("login-message");
-
-            if (!email || !password) {
-                showMessage(messageDiv, "Please fill in all fields.", "danger");
-                return;
-            }
-
-            try {
-                const response = await fetch("/login", {
-                    method: "POST",
-                    headers: {"Content-Type": "application/json"},
-                    body: JSON.stringify({email, password})
-                });
-
-                const data = await response.json();
-
-                if (response.ok) {
-                    showMessage(messageDiv, "Login successful! Redirecting...", "success");
-                    setTimeout(() => window.location.href = "/chatbot", 1500);
-                } else {
-                    showMessage(messageDiv, data.message || "Login failed. Please try again.", "danger");
-                }
-            } catch (error) {
-                console.error("Error logging in:", error);
-                showMessage(messageDiv, "An error occurred. Please try again.", "danger");
-            }
-        });
-    }
-
-    // Handle Registration Form
-    const registerForm = document.querySelector("form[action='/register']");
-    if (registerForm) {
-        registerForm.addEventListener("submit", async function (event) {
-            event.preventDefault();
-
-            const firstname = document.getElementById("firstname").value.trim();
-            const lastname = document.getElementById("lastname").value.trim();
-            const age = document.getElementById("age").value.trim();
-            const email = document.getElementById("email").value.trim();
-            const password = document.getElementById("password").value.trim();
-            const messageDiv = document.getElementById("register-message");
-
-            if (!firstname || !lastname || !age || !email || !password) {
-                showMessage(messageDiv, "Please fill in all fields.", "danger");
-                return;
-            }
-
-            try {
-                const response = await fetch("/register", {
-                    method: "POST",
-                    headers: {"Content-Type": "application/json"},
-                    body: JSON.stringify({firstname, lastname, age, email, password})
-                });
-
-                const data = await response.json();
-
-                if (response.ok) {
-                    showMessage(messageDiv, "Registration successful! Redirecting to login...", "success");
-                    setTimeout(() => window.location.href = "/login", 1500);
-                } else {
-                    showMessage(messageDiv, data.message || "Registration failed. Please try again.", "danger");
-                }
-            } catch (error) {
-                console.error("Error registering:", error);
-                showMessage(messageDiv, "An error occurred. Please try again.", "danger");
-            }
-        });
-    }
-
-    // Function to Show Messages
-    function showMessage(element, message, type) {
-        element.className = `alert alert-${type}`;
-        element.textContent = message;
-        element.classList.remove("d-none");
-    }
-});
-
-//chat history scollable
+// Auto-scroll chat to bottom on page load
 document.addEventListener("DOMContentLoaded", function () {
     const chatBody = document.querySelector(".chat-body");
     if (chatBody) {
@@ -351,14 +89,170 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 });
 
+// ========== QUICK CHAT PROMPTS ==========
+function sendPrompt(message, isPrompt = false) {
+    const userInputField = document.getElementById("user-input");
+    userInputField.value = message;
 
+    // Store prompt flag
+    userInputField.setAttribute("data-is-prompt", isPrompt ? "true" : "false");
 
+    document.getElementById("send-btn").click();
+}
 
+// ========== DELETE CHAT HISTORY ==========
+document.addEventListener("DOMContentLoaded", function () {
+    const confirmDeleteBtn = document.getElementById("confirmDeleteChat");
+    const toastEl = document.getElementById("deleteToast");
 
+    if (confirmDeleteBtn && toastEl) {
+        confirmDeleteBtn.addEventListener("click", () => {
+            fetch("/delete_chat_history", {method: "DELETE"})
+                .then(res => res.json())
+                .then(data => {
+                    if (data.status === "success") {
+                        // Close the modal
+                        const modal = bootstrap.Modal.getInstance(document.getElementById("deleteChatModal"));
+                        if (modal) modal.hide();
 
+                        // Show Bootstrap Toast
+                        const toast = new bootstrap.Toast(toastEl);
+                        toast.show();
 
+                        // Reload after 2.5 seconds
+                        setTimeout(() => location.reload(), 2500);
+                    } else {
+                        showTemporaryError("Error deleting chat history.");
+                    }
+                })
+                .catch(err => {
+                    console.error(err);
+                    showTemporaryError("Server error while deleting history.");
+                });
+        });
+    }
 
+    // Optional: error fallback using toast styling
+    function showTemporaryError(message) {
+        const toastBody = toastEl.querySelector('.toast-body');
+        toastBody.textContent = message;
+        toastEl.classList.remove('text-bg-success');
+        toastEl.classList.add('text-bg-danger');
 
+        const toast = new bootstrap.Toast(toastEl);
+        toast.show();
 
+        // Reset style after 3s
+        setTimeout(() => {
+            toastEl.classList.remove('text-bg-danger');
+            toastEl.classList.add('text-bg-success');
+            toastBody.textContent = "Chat history deleted successfully.";
+        }, 3000);
+    }
+});
 
+// ========== INDEX PAGE ==========
+document.addEventListener("DOMContentLoaded", function () {
+});
 
+// ========== MENTAL HEALTH PAGE ==========
+// Expand/collapse emergency support cards
+function toggleCard(card) {
+    card.classList.toggle("expanded");
+}
+
+// ========== MENTAL HEALTH PAGE ==========
+// Expand/collapse emergency support cards
+if (typeof affirmations === 'undefined') {
+    var affirmations = [
+        "You are doing better than you think 🌸",
+        "Healing is not linear 🧠",
+        "Your feelings are valid 💖",
+        "You are strong, even when you feel weak 💪",
+        "You don’t need to have all the answers right now 🌼",
+        "You are not alone 🤝",
+        "This moment will pass ☀️",
+        "Peace begins with a deep breath 🌬️",
+        "You deserve rest and care 🛌",
+        "I give myself permission to grow at my own pace",
+        "I trust in the timing of my life",
+        "I am not my thoughts, feelings, or fears",
+        "My feelings are valid",
+        "My wellbeing is a priority",
+        "I am allowed to put my needs first",
+        "I choose to be kind to myself",
+        "I appreciate myself just the way I am at this moment",
+        "I give myself permission to struggle",
+        "I can and I will",
+        "I am safe and in control",
+        "I have done this before, and I can do it again",
+        "This too shall pass",
+        "I am strong and resilient",
+        "I trust myself to navigate through this",
+        "I am capable and competent",
+        "I take things one day at a time",
+        "I inhale peace and exhale worry",
+        "This feeling is only temporary",
+        "I am loved and accepted just as I am"
+    ];
+}
+
+function generateAffirmation() {
+    const random = affirmations[Math.floor(Math.random() * affirmations.length)];
+    document.getElementById("affirmation-text").textContent = random;
+}
+
+// ========== MENTAL HEALTH: MYTH SLIDER ==========
+let currentMyth = 0;
+
+function slideMyths(direction) {
+    const slides = document.querySelectorAll('.myth-slide');
+    if (slides.length === 0) return;
+
+    slides[currentMyth].classList.remove('active');
+    currentMyth = (currentMyth + direction + slides.length) % slides.length;
+    slides[currentMyth].classList.add('active');
+}
+
+// Auto-slide myths every 8 seconds
+setInterval(() => slideMyths(1), 8000);
+
+// ========== ABOUT PAGE: ACCORDIONS + SCROLL ANIMATION ==========
+const accordions = document.querySelectorAll(".accordion-toggle");
+accordions.forEach(btn => {
+    btn.addEventListener("click", () => {
+        const content = btn.nextElementSibling;
+        content.style.display = content.style.display === "block" ? "none" : "block";
+    });
+});
+const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+        if (entry.isIntersecting) {
+            entry.target.classList.add('animate');
+            observer.unobserve(entry.target);
+        }
+    });
+}, {threshold: 0.2});
+
+document.querySelectorAll('.about-card').forEach(card => {
+    observer.observe(card);
+});
+
+// ========== FEMALE HEALTH: SCROLL BUTTONS ==========
+document.querySelectorAll(".scroll-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+        const targetId = btn.getAttribute("data-target");
+        const section = document.getElementById(targetId);
+        if (section) {
+            section.scrollIntoView({behavior: "smooth", block: "start"});
+        }
+    });
+});
+
+// ========== FOOTER FETCH (Optional if templated) ==========
+fetch("/footer")
+    .then(res => res.text())
+    .then(data => {
+        const footer = document.getElementById("footer-placeholder");
+        if (footer) footer.innerHTML = data;
+    });
