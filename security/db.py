@@ -1,6 +1,5 @@
 # ===== MongoDB Connection Setup using PyMongo =====
 import os
-
 from pymongo import MongoClient
 
 

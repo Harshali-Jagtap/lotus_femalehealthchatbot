@@ -23,7 +23,7 @@ mood_collection = db_instance.get_collection("mood_tracker")
 @dashboard_bp.route("/dashboard")
 def dashboard():
     """Render the dashboard page with chat history, health tips, reminders, and news."""
-    if "user_id" not in session:  # If a user is not logged in, redirect to login
+    if "user_id" not in session:  # If a user is not logged in, redirect to log in
         return render_template("login.html")
 
     chat_history = get_chat_history(session["email"])
@@ -36,6 +36,27 @@ def dashboard():
         reminders=reminders
     )
 
+# ========== UPDATE PROFILE ==========
+@dashboard_bp.route("/update_profile", methods=["POST"])
+def update_profile():
+    if "user_id" not in session:
+        return jsonify({"status": "error", "message": "Not logged in"}), 403
+
+    data = request.json
+    updates = {
+        "firstname": data.get("firstname"),
+        "lastname": data.get("lastname"),
+        "age": data.get("age"),
+        "email": data.get("email")
+    }
+
+    users_collection.update_one(
+        {"_id": ObjectId(session["user_id"])},
+        {"$set": updates}
+    )
+
+    return jsonify({"status": "success", "message": "Profile updated!"})
+
 
 # ========== CHAT HISTORY ==========
 # Get chat history
@@ -45,7 +66,7 @@ def get_chat_history(user_email):
     user_chat = chat_collection.find_one({"email": user_email})  # Match logged-in user
 
     if user_chat and "chat_history" in user_chat:
-        return user_chat["chat_history"]  # Ensure returning actual chat list
+        return user_chat["chat_history"]  # Ensure returning an actual chat list
 
     return []
 
@@ -129,12 +150,12 @@ def get_events():
     doc = event_collection.find_one({"email": session["email"]})
     events = []
 
-    # 🎯 Filter and append actual calendar events
+    # Filter and append actual calendar events
     if doc and "events" in doc:
         for event in doc["events"]:
             event_date = event.get("date")
 
-            # ✅ Safely check the date is valid before comparing
+            # Safely check the date is valid before comparing
             if isinstance(event_date, str) and start and end:
                 if start <= event_date <= end:
                     events.append({

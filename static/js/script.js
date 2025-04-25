@@ -21,7 +21,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 });
 
-// Send user message to server and display bot response
+// Send user a message to server and display bot response
 async function sendMessage() {
     const userInputField = document.getElementById("user-input");
     const chatBody = document.getElementById("chat-body");
@@ -45,21 +45,46 @@ async function sendMessage() {
     userInputField.value = "";
 
     // Show typing animation
+    chatBody.appendChild(typingIndicator);
     typingIndicator.style.display = "block";
     chatBody.scrollTop = chatBody.scrollHeight;
 
     // Get bot response
-    const botResponse = await fetchResponse(userMessage);
-
-    // Hide typing
+    const data = await fetchResponse(userMessage);
     typingIndicator.style.display = "none";
 
-    // Show bot message
+    // Bot main response
     const botMessageDiv = document.createElement("div");
     botMessageDiv.classList.add("chat-message", "bot-message");
-    botMessageDiv.textContent = botResponse;
+    botMessageDiv.textContent = data.response || "I'm here to help!";
     chatBody.appendChild(botMessageDiv);
+
+    // Optional follow-up
+    if (data.follow_up) {
+        const followUpDiv = document.createElement("div");
+        followUpDiv.classList.add("chat-message", "bot-message");
+        followUpDiv.style.fontStyle = "italic";
+        followUpDiv.textContent = "" + data.follow_up;
+        chatBody.appendChild(followUpDiv);
+        console.log("Follow-up:", data.follow_up);
+    }
+
     chatBody.scrollTop = chatBody.scrollHeight;
+
+    //Relative Timestamps
+    dayjs.extend(dayjs_plugin_relativeTime);
+    const time = document.createElement("span");
+    time.className = "timestamp";
+    time.textContent = dayjs().fromNow(); // e.g., “a few seconds ago”
+    chatBody.appendChild(time);
+
+    // Sentiment Icons for User Messages
+    const sentiment = new Sentiment();
+    const result = sentiment.analyze(userMessage);
+    const score = result.score;
+    const moodIcon = score > 1 ? "😊" : score < -1 ? "😔" : "😐";
+    userMessageDiv.innerHTML = `${moodIcon} ${userMessage}`;
+
 }
 
 // Fetch bot reply from backend
@@ -74,14 +99,128 @@ async function fetchResponse(userMessage) {
 
         const data = await response.json();
         console.log("Received response:", data);
-        return data.response || "I'm here to help! Could you clarify your question?";
+        return data;
     } catch (error) {
         console.error("Error fetching bot response:", error);
         return "Sorry, I encountered an issue processing your request.";
     }
 }
 
-// Auto-scroll chat to bottom on page load
+// ========== TALK TO ME ==========
+function startGuidedFlow() {
+    const steps = [
+        {
+            question: "🌿 How are you feeling emotionally today?",
+            options: ["Anxious", "Sad", "Lonely", "Overwhelmed", "Numb", "Curious"]
+        },
+        {
+            question: "💬 Would you like to talk more about what’s bothering you?",
+            options: ["Yes, I’d like to talk", "Not right now"]
+        },
+        {
+            question: "🧘 Would you like to try a calming activity?",
+            options: ["Breathing Exercise", "Grounding Technique", "Mindful Music", "No, thanks"]
+        },
+        {
+            question: "🤝 Would you like some support resources (e.g., articles, videos, music)?",
+            options: ["Yes, please", "No, I'm okay"]
+        }
+    ];
+
+    let step = 0;
+    let topicTracker = [];
+
+    function showStep(stepObj) {
+        const chatBody = document.getElementById("chat-body");
+
+        const questionDiv = document.createElement("div");
+        questionDiv.className = "chat-message bot-message";
+        questionDiv.textContent = stepObj.question;
+        chatBody.appendChild(questionDiv);
+
+        const optionsDiv = document.createElement("div");
+        optionsDiv.className = "d-flex flex-wrap gap-2 my-2";
+
+        stepObj.options.forEach(option => {
+            const btn = document.createElement("button");
+            btn.className = "btn btn-sm btn-outline-primary";
+            btn.textContent = option;
+
+            btn.onclick = () => {
+                const userDiv = document.createElement("div");
+                userDiv.className = "chat-message user-message";
+                userDiv.textContent = option;
+                chatBody.appendChild(userDiv);
+
+                // Track user's selections for topic relevance
+                topicTracker.push(option.toLowerCase());
+
+                // Resource request on a final step if "Yes, please"
+                if (stepObj.question.includes("support resources") && option === "Yes, please") {
+                    const finalTopic = topicTracker.includes("mindful music") ? "calming music for relaxation"
+                        : topicTracker.includes("breathing") ? "deep breathing techniques"
+                            : topicTracker.includes("sad") ? "coping with sadness"
+                                : "emotional wellbeing";
+
+                    fetch("/mental-support", {
+                        method: "POST",
+                        headers: {"Content-Type": "application/json"},
+                        body: JSON.stringify({topic: finalTopic})
+                    })
+                        .then(res => res.json())
+                        .then(data => {
+                            const resourceDiv = document.createElement("div");
+                            resourceDiv.className = "chat-message bot-message";
+                            resourceDiv.innerHTML = "📚 Helpful Resources:<ul>" +
+                                data.resources.map(r => {
+                                    // Split lines by numbers (e.g., 1., 2., 3.)
+                                    return r
+                                        .split(/\\d+\\.\\s+/)  // split numbered points
+                                        .filter(item => item.trim() !== "")
+                                        .map(item =>
+                                            `<li>${item.replace(/(https?:\/\/[^\s]+)/g, '<a href="$1" target="_blank">$1</a>')}</li>`
+                                        ).join("");
+                                }).join("") +
+                                "</ul>";
+
+                            chatBody.appendChild(resourceDiv);
+                            chatBody.scrollTop = chatBody.scrollHeight;
+                        });
+                }
+
+                // Move to the next step or end
+                step++;
+                if (step < steps.length) {
+                    setTimeout(() => showStep(steps[step]), 1000);
+                } else {
+                    const doneDiv = document.createElement("div");
+                    doneDiv.className = "chat-message bot-message";
+                    doneDiv.innerHTML = "💖 Thank you for sharing. I'm always here if you want to talk more.";
+                    chatBody.appendChild(doneDiv);
+                }
+
+                chatBody.scrollTop = chatBody.scrollHeight;
+            };
+
+            optionsDiv.appendChild(btn);
+        });
+
+        chatBody.appendChild(optionsDiv);
+        chatBody.scrollTop = chatBody.scrollHeight;
+    }
+
+    showStep(steps[0]);
+}
+
+//Bot response
+function displayBotMessage(msg) {
+    const botDiv = document.createElement("div");
+    botDiv.className = "chat-message bot-message";
+    botDiv.textContent = msg;
+    document.getElementById("chat-body").appendChild(botDiv);
+}
+
+// Auto-scroll chat to bottom on a page load
 document.addEventListener("DOMContentLoaded", function () {
     const chatBody = document.querySelector(".chat-body");
     if (chatBody) {
@@ -142,11 +281,92 @@ document.addEventListener("DOMContentLoaded", function () {
         const toast = new bootstrap.Toast(toastEl);
         toast.show();
 
-        // Reset style after 3s
+        // Reset style after 3 seconds
         setTimeout(() => {
             toastEl.classList.remove('text-bg-danger');
             toastEl.classList.add('text-bg-success');
             toastBody.textContent = "Chat history deleted successfully.";
+        }, 3000);
+    }
+});
+
+// ========== DASHBOARD PAGE ==========
+document.addEventListener("DOMContentLoaded", function () {
+    // ===================== EDIT PROFILE FORM TOGGLE =====================
+    const editBtn = document.getElementById("editProfileBtn");
+    const editForm = document.getElementById("editProfileForm");
+
+    if (editBtn && editForm) {
+        editBtn.addEventListener("click", () => {
+            const isVisible = editForm.style.display === "block";
+            editForm.style.display = isVisible ? "none" : "block";
+            if (!isVisible) {
+                editForm.scrollIntoView({behavior: "smooth", block: "start"});
+            }
+        });
+    }
+
+    // ===================== PROFILE FORM SUBMIT =====================
+    const profileForm = document.getElementById("profileUpdateForm");
+    if (profileForm) {
+        profileForm.addEventListener("submit", async (e) => {
+            e.preventDefault();
+            const formData = new FormData(profileForm);
+            const json = Object.fromEntries(formData.entries());
+
+            try {
+                const res = await fetch("/update_profile", {
+                    method: "POST",
+                    headers: {"Content-Type": "application/json"},
+                    body: JSON.stringify(json)
+                });
+
+                const result = await res.json();
+                if (result.status === "success") {
+                    showSuccessToast();
+                } else {
+                    showErrorToast(result.message || "Something went wrong.");
+                }
+            } catch (err) {
+                console.error("Profile update error:", err);
+                showErrorToast("Server error while updating profile.");
+            }
+        });
+    }
+
+    // ===================== TOAST FUNCTIONS =====================
+    function showSuccessToast() {
+        const toast = new bootstrap.Toast(document.getElementById("profileToast"));
+        toast.show();
+
+        // Optionally hide the form again
+        const form = document.getElementById("editProfileForm");
+        if (form) {
+            form.style.display = "none";
+        }
+
+        // Cleanup modal backdrop and scroll lock (if they ever interfere)
+        document.body.classList.remove("modal-open");
+        document.body.style.removeProperty("overflow");
+        document.body.style.removeProperty("padding-right");
+        document.querySelectorAll(".modal-backdrop").forEach(el => el.remove());
+    }
+
+    function showErrorToast(message) {
+        const toastEl = document.getElementById("profileToast");
+        const toastBody = toastEl.querySelector(".toast-body");
+        toastBody.textContent = message;
+
+        toastEl.classList.remove("text-bg-success");
+        toastEl.classList.add("text-bg-danger");
+
+        const toast = new bootstrap.Toast(toastEl);
+        toast.show();
+
+        setTimeout(() => {
+            toastEl.classList.remove("text-bg-danger");
+            toastEl.classList.add("text-bg-success");
+            toastBody.textContent = "Profile updated successfully!";
         }, 3000);
     }
 });

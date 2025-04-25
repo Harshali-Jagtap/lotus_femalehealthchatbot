@@ -174,14 +174,178 @@ body {
     gap: 20px;
 }
 
+/* Edit profile */
+/* === Edit Profile Button === */
+#editProfileBtn {
+    background: linear-gradient(135deg, #ff7eb3, #f8798f);
+    color: white;
+    font-weight: 600;
+    font-size: 1.1rem;
+    padding: 12px 28px;
+    border: none;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(255, 126, 179, 0.15);
+    transition: background 0.3s ease;
+}
+
+#editProfileBtn:hover {
+    background: linear-gradient(135deg, #f8798f, #ff7eb3);
+}
+
+/* === Edit Profile Form Container === */
+#editProfileForm {
+    background: linear-gradient(145deg, #fff0f5, #ffe6ee);
+    border-radius: 25px;
+    padding: 2rem;
+    max-width: 550px;
+    margin: 2rem auto;
+    box-shadow: 0 8px 24px rgba(255, 126, 179, 0.15);
+    animation: fadeInUp 0.5s ease forwards;
+}
+
+/* === Form Header === */
+#editProfileForm .gradient-header {
+    background: linear-gradient(135deg, #ff7eb3, #f8798f);
+    color: white;
+    padding: 1.5rem 1rem 1rem;
+    border-radius: 20px 20px 0 0;
+    text-align: center;
+}
+
+#editProfileForm .gradient-header h2 {
+    font-weight: bold;
+    margin-bottom: 0.2rem;
+}
+
+#editProfileForm .gradient-header i {
+    font-size: 2.4rem;
+    margin-bottom: 0.6rem;
+    display: block;
+}
+
+/* === Input Styles === */
+#editProfileForm .form-label {
+    display: block;
+    font-weight: 500;
+    color: #5a3e36;
+    margin-top: 1rem;
+    margin-bottom: 0.4rem;
+}
+
+#editProfileForm .form-control {
+    width: 100%;
+    padding: 10px 14px;
+    border: 1px solid #ffd5e6;
+    border-radius: 10px;
+    background-color: #fffaf5;
+    transition: border 0.3s ease;
+}
+
+#editProfileForm .form-control:focus {
+    border-color: #f8798f;
+    box-shadow: 0 0 0 0.15rem rgba(248, 121, 143, 0.25);
+}
+
+/* === Save Button === */
+#editProfileForm button[type="submit"] {
+    margin-top: 1.2rem;
+    padding: 12px;
+    font-size: 1rem;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #ff7eb3, #f8798f);
+    color: white;
+    font-weight: 600;
+    border: none;
+    transition: background 0.3s ease;
+}
+
+#editProfileForm button[type="submit"]:hover {
+    background: linear-gradient(135deg, #f8798f, #ff7eb3);
+}
+
+/* === Animation === */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
 .chat-history-box {
     flex: 1 1 45%;
 }
 
-.chat-history-box, .chat-history-column {
+.chat-history-column {
     width: 600px;
     height: auto;
+    padding: 1rem;
+    border-radius: 16px;
+    box-shadow: 0 6px 20px rgba(248, 121, 143, 0.1);
 }
+.chat-history-box {
+    height: 700px;
+    display: flex;
+    flex-direction: column;
+    padding: 1rem;
+    border-radius: 16px;
+    background: #fffaf5;
+    box-shadow: 0 6px 20px rgba(248, 121, 143, 0.1);
+}
+.chat-body {
+    flex-grow: 1;
+    overflow-y: auto;
+    padding: 1rem;
+    background-color: #fffaf5;
+    box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.04);
+}
+
+.chat-message .text-muted {
+    font-size: 0.85rem;
+    margin-top: 4px;
+    display: inline-block;
+}
+.chat-card {
+    border-left: 5px solid #f8798f;
+    border-radius: 14px;
+    padding: 1rem;
+    transition: transform 0.2s ease-in-out;
+    animation: fadeInUp 0.4s ease;
+}
+
+.chat-card:hover {
+    transform: scale(1.01);
+    box-shadow: 0 8px 18px rgba(248, 121, 143, 0.15);
+}
+
+.chat-bubble {
+    padding: 10px 14px;
+    border-radius: 12px;
+    margin-bottom: 0.3rem;
+    word-wrap: break-word;
+    font-size: 0.95rem;
+}
+
+.user-bubble {
+    background-color: #ffe6ee;
+    color: #5a3e36;
+    font-weight: 500;
+}
+
+.bot-bubble {
+    background-color: #f9f9f9;
+    color: #444;
+    border-left: 4px solid #f8798f;
+}
+
+.chat-timestamp {
+    font-size: 0.8rem;
+    color: #999;
+}
+
 
 /* CALENDAR */
 .calendar-column, .calendar-box {
@@ -432,6 +596,7 @@ body {
 #moodTrackerModal .text-end {
     text-align: right;
 }
+
 .fc-event.mood-symbol {
     background-color: transparent;
     border: none;
@@ -455,6 +620,7 @@ body {
     border-radius: 15px;
     box-shadow: 4px 10px rgba(0, 0, 0, 0.1);
     overflow: hidden;
+
 }
 
 /* Chat Header */
@@ -472,7 +638,7 @@ body {
 
 /* Scrollable Chat Body */
 .chat-body {
-    height: 350px;
+    height: 500px;
     overflow-y: auto;
     padding: 15px;
     display: flex;
@@ -563,6 +729,7 @@ body {
     max-width: 500px;
     width: 90%;
     margin: auto;
+    height: auto;
 }
 
 /* Big error code */
@@ -947,6 +1114,61 @@ body {
     }
 }
 
+/* === Password Reset & Forgot Page === */
+.forget-password, .reset-password {
+    background: #fffaf5;
+    padding: 40px 30px;
+    max-width: 400px;
+    margin: auto;
+    border-radius: 20px;
+    box-shadow: 0 8px 20px rgba(255, 126, 179, 0.15);
+    text-align: center;
+    font-family: 'Montserrat', sans-serif;
+}
+
+.forget-password h2, .reset-password h2 {
+    color: #f8798f;
+    margin-bottom: 1.5rem;
+}
+
+.forget-password input[type="email"],
+.reset-password input[type="password"] {
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 20px;
+    border: 1px solid #fcd2db;
+    border-radius: 10px;
+    font-size: 1rem;
+    outline: none;
+    background: #fff;
+    transition: border 0.3s ease;
+}
+
+.forget-password input:focus,
+.reset-password input:focus {
+    border-color: #f8798f;
+    box-shadow: 0 0 0 0.2rem rgba(248, 121, 143, 0.25);
+}
+
+.send-reset-link-btn,
+.reset-password-btn {
+    background: linear-gradient(135deg, #ff7eb3, #f8798f);
+    color: white;
+    border: none;
+    padding: 12px 28px;
+    border-radius: 12px;
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background 0.3s ease;
+}
+
+.send-reset-link-btn:hover,
+.reset-password-btn:hover {
+    background: linear-gradient(135deg, #f8798f, #ff7eb3);
+}
+
+
 /* ========================================= */
 /* ============ Chatbot floating button============= */
 /* ========================================= */
@@ -1003,6 +1225,30 @@ body {
 .features-section .card:nth-child(3),
 .testimonial-card:nth-child(3) {
     animation-delay: 0.7s;
+}
+
+/* Typing Animation */
+#typing-indicator::after {
+    content: '';
+    display: inline-block;
+    margin-left: 5px;
+    width: 1ch;
+    animation: dots 1s steps(3, end) infinite;
+}
+
+@keyframes dots {
+    0% {
+        content: '';
+    }
+    33% {
+        content: '.';
+    }
+    66% {
+        content: '..';
+    }
+    100% {
+        content: '...';
+    }
 }
 
 /* ========================================= */
@@ -1361,6 +1607,7 @@ body {
 .myth-slider-buttons button:hover {
     background-color: #e86f9a;
 }
+
 /*Medical Help Resource*/
 .resource-card-grid {
     display: grid;
@@ -1571,6 +1818,41 @@ body {
     list-style: none;
     padding-left: 0;
     margin-left: 0;
+}
+
+/* ========================================= */
+/* ============ GDPR ==================== */
+/* ========================================= */
+
+.gdpr-popup {
+    position: fixed;
+    z-index: 9999;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: #fff0f5;
+    padding: 1.5rem;
+    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.1);
+    border-top: 3px solid #f8798f;
+    display: none;
+    justify-content: center;
+    align-items: center;
+}
+
+.gdpr-content {
+    max-width: 500px;
+    text-align: center;
+}
+
+.gdpr-content h4 {
+    color: #f8798f;
+    font-weight: 600;
+}
+
+.gdpr-content p {
+    font-size: 0.95rem;
+    color: #5a3e36;
+    margin-bottom: 1rem;
 }
 
 /* ========================================= */

@@ -38,8 +38,41 @@
 <!-- ========== USER DASHBOARD PAGE ========== -->
 <div class="container mt-5 dashboard-container">
     <!-- Page Heading -->
-    <h1 class="text-center text-primary">User Dashboard</h1>
+    <h1 class="fw-bold text-center mb-4">User Dashboard</h1>
     <p class="text-center text-muted">View your past questions, reminders, log your mood for the day.</p>
+
+    <!-- === Edit Profile Button === -->
+    <div class="text-center my-4">
+        <button class="btn btn-primary" id="editProfileBtn">
+            <i class="bi bi-pencil-square me-2"></i>Edit Profile
+        </button>
+    </div>
+
+    <!-- === Edit Profile Form === -->
+    <div id="editProfileForm" class="bot-style-card mx-auto mt-4" style="display: none; max-width: 550px;">
+        <div class="gradient-header text-center">
+            <i class="bi bi-person-circle"></i>
+            <h2>Edit Your Profile</h2>
+            <small>Keep your info up to date</small>
+        </div>
+        <div class="card-body">
+            <form id="profileUpdateForm">
+                <label class="form-label">First Name</label>
+                <input type="text" class="form-control mb-3" name="firstname" value="{{ users.firstname }}" required>
+
+                <label class="form-label">Last Name</label>
+                <input type="text" class="form-control mb-3" name="lastname" value="{{ users.lastname }}" required>
+
+                <label class="form-label">Age</label>
+                <input type="number" class="form-control mb-3" name="age" value="{{ users.age }}" required min="1">
+
+                <label class="form-label">Email</label>
+                <input type="email" class="form-control mb-3" name="email" value="{{ users.email }}" required>
+
+                <button type="submit" class="btn btn-primary w-100 mt-2">Save Changes</button>
+            </form>
+        </div>
+    </div>
 
     <!-- Dashboard Two-Column Layout: Chat History + Calendar -->
     <div class="dashboard-row">
@@ -48,15 +81,23 @@
         <div class="chat-history-column">
             <div class="chat-history-box">
                 <!-- Section Title -->
-                <div class="card-header">Chat History</div>
-                <div class="chat-body" id="chat-body">
+                <h2>Chat History</h2>
+                <div class="chat-body">
                     <!-- Display chat history (from Jinja context) -->
                     {% if chat_history %}
                     {% for chat in chat_history %}
-                    <div class="chat-message">
-                        <strong>You:</strong> {{ chat.user_message }}<br>
-                        <strong>Bot:</strong> {{ chat.bot_response }}<br>
-                        <span class="text-muted">{{ chat.timestamp }}</span>
+                    <div class="chat-card mb-3 p-3 rounded shadow-sm">
+                        <div class="chat-row">
+                            <div class="chat-bubble user-bubble mb-2">
+                                <strong>You:</strong> {{ chat.user_message }}
+                            </div>
+                            <div class="chat-bubble bot-bubble">
+                                <strong>Bot:</strong> {{ chat.bot_response }}
+                            </div>
+                        </div>
+                        <div class="chat-timestamp text-end text-muted small">
+                            {{ chat.timestamp }}
+                        </div>
                     </div>
                     <hr>
                     {% endfor %}
@@ -107,7 +148,6 @@
                     </div>
                 </div>
 
-
             </div>
         </div>
 
@@ -120,6 +160,20 @@
         </div>
     </div>
     <br>
+
+    <!-- Profile Update Toast Notification -->
+    <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 1060;">
+        <div id="profileToast" class="toast align-items-center text-bg-success border-0" role="alert"
+             aria-live="assertive" aria-atomic="true">
+            <div class="d-flex">
+                <div class="toast-body">
+                    Profile updated successfully!
+                </div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"
+                        aria-label="Close"></button>
+            </div>
+        </div>
+    </div>
 
     <!-- Mood Tracker Section -->
     <div class="mood-tracker mt-4">

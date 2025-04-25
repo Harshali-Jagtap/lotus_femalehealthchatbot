@@ -14,6 +14,13 @@
     <!-- Bootstrap Icons (for UI icons like arrows, alerts, etc.) -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css">
 
+    <!-- Day.js (Relative Timestamps) -->
+    <script src="https://cdn.jsdelivr.net/npm/dayjs/dayjs.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/dayjs/plugin/relativeTime.js"></script>
+
+    <!-- Sentiment.js (Sentiment Icons for User Messages) -->
+    <script src="https://cdn.jsdelivr.net/npm/sentiment@5.0.1/build/sentiment.min.js"></script>
+
     <!-- Custom Site Styles -->
     <link rel="stylesheet" href="/static/css/style.css">
 </head>
@@ -69,7 +76,7 @@
             </div>
         </div>
         <!-- Placeholder for dynamically added chat messages -->
-        <div id="typing-indicator" class="chat-message bot-message" style="display:none;">🤖 Typing...</div>
+        <div id="typing-indicator" class="chat-message bot-message" style="display:none;">Typing</div>
     </div>
 
     <!-- Chat Input Area -->
@@ -79,6 +86,8 @@
                                                placeholder="Type your message..." autocomplete="off"/>
         <button id="send-btn" class="btn btn-primary">Send</button>
     </div>
+    <button class="btn btn-outline-pink" onclick="startGuidedFlow()">🧠 Talk To Me</button>
+
 </div>
 
 <!-- Include shared Footer from Jinja template -->

@@ -4,15 +4,18 @@ from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 from datetime import datetime, timedelta, timezone
 from jwt import ExpiredSignatureError, InvalidTokenError
-import bcrypt
-import jwt
-import os
+import bcrypt, jwt, os, re
 from bson import ObjectId  # Import ObjectId
 from security.db import db_instance  # Reusable DB connection
+from flask import current_app
+from flask_mail import Mail, Message
 
 # ===== FLASK Config =====
 SECRET_KEY = os.getenv("SECRET_KEY", "your_secret_key")
 auth_bp = Blueprint("auth", __name__, template_folder="templates")
+
+# Mail configuration (you can change this to any working real SMTP)
+mail = Mail()
 
 # MongoDB Collection: Users
 users_collection = db_instance.get_collection("users")
@@ -69,7 +72,7 @@ def chatbot():
 # Route: Register a new user
 @auth_bp.route("/register", methods=["POST"])
 def register():
-    """Handles user registration."""
+    """Handles user registration with password strength validation."""
     if request.content_type == "application/json":
         data = request.get_json()
     else:
@@ -81,12 +84,24 @@ def register():
     email = data.get("email")
     password = data.get("password")
 
+    # Check if email already exists
     if users_collection.find_one({"email": email}):
-        flash("Email already exists. Try logging in.", "danger")  # Show an error message
-        return redirect("login.html")
+        flash("Email already exists. Try logging in.", "danger")
+        return redirect(url_for("auth.render_login_form"))
 
+    # Password strength rule enforcement
+    import re
+    password_pattern = r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$'
+    if not re.match(password_pattern, password):
+        flash(
+            "Password must be at least 8 characters long, contain upper and lower case letters, a number, and a special character.",
+            "danger")
+        return redirect(url_for("auth.render_login_form"))
+
+    # Hash password
     hashed_password = bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt()).decode("utf-8")
 
+    # Save user
     users_collection.insert_one({
         "firstname": firstname,
         "lastname": lastname,
@@ -98,8 +113,8 @@ def register():
         "created_at": datetime.utcnow()
     })
 
-    flash("Registration successful! Please login.", "success")  # Flash success message
-    return redirect("login.html")
+    flash("Registration successful! Please login.", "success")
+    return redirect(url_for("auth.render_login_form"))
 
 
 # Route: Login with email and password
@@ -128,6 +143,11 @@ def login():
     return redirect(url_for("auth.chatbot"))
 
 
+@auth_bp.route("/login", methods=["GET"])
+def render_login_form():
+    return render_template("login.html")
+
+
 # Route: Logout and return to home pag
 @auth_bp.route("/logout", methods=["GET"])
 def logout():
@@ -138,28 +158,75 @@ def logout():
 # Route: Forgot Password (generates JWT reset token)
 @auth_bp.route("/forgot-password", methods=["POST"])
 def forgot_password():
-    data = request.json
+    # Support both form (HTML) and JSON (API) submissions
+    if request.content_type == "application/json":
+        data = request.get_json()
+    else:
+        data = request.form
+
     email = data.get("email")
 
     user = users_collection.find_one({"email": email})
     if not user:
-        return jsonify({"message": "If this email exists, a reset link has been sent.", "status": "success"}), 200
+        # Always respond generically to avoid email enumeration
+        if request.content_type == "application/json":
+            return jsonify({"message": "If this email exists, a reset link has been sent.", "status": "success"}), 200
+        flash("If this email exists, a reset link has been sent.", "info")
+        return redirect(url_for("auth.render_forgot_password_form"))
 
+    # Generate JWT reset token
     reset_token = jwt.encode(
-        {"email": email, "exp": datetime.now(timezone.utc) + timedelta(minutes=15)},  # Fix timezone issue
+        {"email": email, "exp": datetime.now(timezone.utc) + timedelta(minutes=15)},
         SECRET_KEY,
         algorithm="HS256"
     )
 
-    # TODO: Send `reset_token` via email to user
-    return jsonify({"message": "A password reset link has been sent to your email.", "status": "success",
-                    "token": reset_token}), 200  # Fix unused variable warning
+    reset_link = f"http://localhost:5000/reset-password?token={reset_token}"
+
+    # Send reset email
+    msg = Message("Lotus - Password Reset",
+                  sender=current_app.config["MAIL_USERNAME"],
+                  recipients=[email])
+    msg.body = f"""
+    Hello,
+
+    You requested a password reset for your Lotus account.
+    Click the link below to reset your password (valid for 15 minutes):
+
+    {reset_link}
+
+    If you didn't request this, please ignore this email.
+
+    Regards,
+    Lotus Team
+    """
+
+    mail.send(msg)
+
+    if request.content_type == "application/json":
+        return jsonify({
+            "message": "A password reset link has been sent to your email.",
+            "status": "success",
+            "token": reset_token
+        }), 200
+    else:
+        flash("A password reset link has been sent to your email.", "success")
+        return redirect(url_for("auth.render_forgot_password_form"))
 
 
-# Route: Reset Password using JWT token
+@auth_bp.route("/forgot-password", methods=["GET"])
+def render_forgot_password_form():
+    return render_template("forgot_password.html")
+
+
+# Route: Reset Password using JWT token and Mail Trap
 @auth_bp.route("/reset-password", methods=["POST"])
 def reset_password():
-    data = request.json
+    if request.content_type == "application/json":
+        data = request.get_json()
+    else:
+        data = request.form
+
     token = data.get("token")
     new_password = data.get("password")
 
@@ -175,3 +242,9 @@ def reset_password():
     users_collection.update_one({"email": email}, {"$set": {"password": hashed_password}})
 
     return render_template("login.html", success="Password reset successful. Please login.")
+
+
+@auth_bp.route("/reset-password", methods=["GET"])
+def render_reset_form():
+    token = request.args.get("token")
+    return render_template("reset_password.html", token=token)

@@ -17,7 +17,7 @@ from routes.about import about_bp
 from routes.mental_health import mental_health_bp
 from routes.female_health import female_health_bp
 from routes.gdpr import gdpr_bp
-
+from flask_mail import Mail
 
 # ===== TRANSFORMER WARNING CONFIG =====
 from transformers import logging as transformers_logging
@@ -45,17 +45,36 @@ app.register_blueprint(mental_health_bp)
 app.register_blueprint(female_health_bp)
 app.register_blueprint(gdpr_bp)
 
+# Initialize Mail
+mail = Mail()
+
+# Email settings
+app.config.update(
+    MAIL_SERVER=os.getenv("MAIL_SERVER"),
+    MAIL_PORT=int(os.getenv("MAIL_PORT")),
+    MAIL_USE_TLS=os.getenv("MAIL_USE_TLS") == "True",
+    MAIL_USERNAME=os.getenv("MAIL_USERNAME"),
+    MAIL_PASSWORD=os.getenv("MAIL_PASSWORD"),
+    MAIL_DEFAULT_SENDER=os.getenv("MAIL_USERNAME")
+)
+
+# Bind mail to app
+mail.init_app(app)
+
 
 @app.before_request
 def enforce_gdpr():
     allowed_endpoints = [
-        "gdpr.privacy_notice", "gdpr.consent", "static"
+        "gdpr.privacy_notice", "gdpr.consent", "static",
+        "auth.render_reset_form",  # ✅ allow GET /reset-password
+        "auth.reset_password",  # ✅ allow POST /reset-password
+        "auth.render_forgot_password_form",
+        "auth.forgot_password"
     ]
     if request.endpoint in allowed_endpoints or session.get("gdpr_consent"):
         return  # Allow access
 
     return redirect(url_for("gdpr.privacy_notice"))
-
 
 
 # ===== ROUTE: Home Page =====
