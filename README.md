@@ -33,6 +33,7 @@ It leverages cutting-edge NLP models such as BioBERT, ClinicalBERT, T5 Summarize
    git clone https://github.com/Harshali-Jagtap/lotus_femalehealthchatbot.git
    cd lotus-female-health-chatbot
    ```
+   Or Simply download it!
 
 2. Create a virtual environment:
    ```bash
