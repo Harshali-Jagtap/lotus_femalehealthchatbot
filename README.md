@@ -53,11 +53,14 @@ It leverages cutting-edge NLP models such as BioBERT, ClinicalBERT, T5 Summarize
      FLASK_APP=main.py
      FLASK_ENV=development
      SECRET_KEY=your_secret_key
-     JWT_SECRET_KEY=your_jwt_secret
+     OPENAI_API_KEY=your_openai_key
+     DATABASE_NAME=your_databasename
      MAIL_USERNAME=your_mailtrap_username
      MAIL_PASSWORD=your_mailtrap_password
      MAIL_SERVER=smtp.mailtrap.io
      MAIL_PORT=2525
+     MAIL_USE_TLS=True
+     MAIL_DEFAULT_SENDER=mailtrap_email@inbox.mailtrap.io
      ```
 
 5. Run the application:
