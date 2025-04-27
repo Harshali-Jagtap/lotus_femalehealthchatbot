@@ -62,7 +62,7 @@ It leverages cutting-edge NLP models such as BioBERT, ClinicalBERT, T5 Summarize
      MAIL_USE_TLS=True
      MAIL_DEFAULT_SENDER=mailtrap_email@inbox.mailtrap.io
      ```
-
+    ##⚠️ Note: Create your own Mail Trap account and paste Username, Password and Email Address for mailtrap in .env (see above)
 5. Run the application:
    ```bash
    flask run
