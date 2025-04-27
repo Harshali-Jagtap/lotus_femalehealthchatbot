@@ -23,7 +23,7 @@ It leverages cutting-edge NLP models such as BioBERT, ClinicalBERT, T5 Summarize
 | /routes/           | Flask routes (auth, chatbot, dashboard, mental health) |
 | /security/        | Database connection |
 | /templates/        | Frontend HTML pages |
-| /static/           | CSS and JavaScript assets |
+| /static/           | Images, CSS and JavaScript assets |
 | main.py            | Flask application runner |
 | .env               | Environment variables for configuration |
 
