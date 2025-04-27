@@ -18,7 +18,7 @@ It leverages cutting-edge NLP models such as BioBERT, ClinicalBERT, T5 Summarize
 ## 🏗️ System Structure
 | Directory/Component | Purpose |
 |----------------------|---------|
-| /datat/           | Json Files (DrugBank, MedQuad, Mental Health, Prompt Responses) |
+| /data/           | Json Files (DrugBank, MedQuad, Mental Health, Prompt Responses) |
 | /models/           | AI Models (BioBERT, ClinicalBERT, BART Classifier, T5 Summarizer) |
 | /routes/           | Flask routes (auth, chatbot, dashboard, mental health) |
 | /security/        | Database connection |
