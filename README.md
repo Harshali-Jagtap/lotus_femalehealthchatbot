@@ -73,15 +73,17 @@ It leverages cutting-edge NLP models such as BioBERT, ClinicalBERT, T5 Summarize
 - Setup MongoDB Atlas for secure cloud database hosting.
 
 ## ⚠️ Common Errors & Solutions
-
+If you encounter a common error and they occur due to version updates/downgrades.
 ### ❌ ImportError: cannot import name 'ExpiredSignatureError' from 'jwt'
 **Solution:**
 ```python
 from jwt.exceptions import ExpiredSignatureError, InvalidTokenError
 ```
-Ensure PyJWT is updated:
+Ensure the following:
 ```bash
+pip uninstall PyJWT
 pip install --upgrade PyJWT
+pip install --force-reinstall pymongo
 ```
 
 ### ❌ ImportError: T5Tokenizer requires the SentencePiece library
@@ -108,7 +110,7 @@ pip install sentencepiece
 
 ## 🙏 Acknowledgements
 - Supervisor: Oliver Hyde (TUS)
-- Libraries Used: Huggingface Transformers, Flask, MongoDB Atlas, Chart.js
+- Libraries Used: Huggingface Transformers, Flask, MongoDB Atlas, Chart.js, Moment.js, Bootstrap
 
 ---
 
